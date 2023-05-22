@@ -10,7 +10,7 @@ class UserManager(BaseUserManager):
 
         user = self.model(
             account=account,
-            email=self.normalize_email(email),  # 소문자로 바꾼 후 정규화 체크
+            email=self.normalize_email(email),
             **extra_fields
         )
         user.set_password(password)
@@ -28,7 +28,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
+# 유저 모델
 class User(AbstractBaseUser):
     class Meta:
         db_table = "User"
@@ -37,6 +37,7 @@ class User(AbstractBaseUser):
     email = models.EmailField("이메일",max_length=255, unique=True)
     nickname = models.CharField("닉네임", max_length=15)
     profile_img = models.ImageField("프로필사진",blank=True,)
+    introduce = models.TextField("소개", blank=True, null=True)
    
     followings = models.ManyToManyField("self", symmetrical=False, related_name='followers', blank=True)
 

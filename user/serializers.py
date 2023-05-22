@@ -51,7 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("nick_name","photo",)
+        fields = ("nickname","profile_img","introduce")
 
     def create(self, validated_data):
         user = super().create(validated_data)
@@ -185,7 +185,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
 # class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = User
-#         fields = ("nick_name","password","photo",)
+#         fields = ("nickname","password","profile_img",)
 
 #     def create(self, validated_data):
 #         user = super().create(validated_data)

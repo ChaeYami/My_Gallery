@@ -13,12 +13,11 @@ from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from user.serializers import UserSerializer, CustomTokenObtainPairSerializer, UserProfileSerializer
-from .serializers import PasswordResetSerializer, SetNewPasswordSerializer, TokenSerializer, EmailThread, PasswordVerificationSerializer
+from user.serializers import UserSerializer, CustomTokenObtainPairSerializer, UserProfileSerializer, UserDelSerializer, PasswordResetSerializer, SetNewPasswordSerializer, TokenSerializer, EmailThread, PasswordVerificationSerializer
 
 from .models import User
 
-# ================================ 회원가입 ================================
+# ================================ 회원가입 시작 ================================
 class Util:
 
     @staticmethod
@@ -78,6 +77,9 @@ class VerifyEmailView(APIView):
             return redirect ('http://127.0.0.1:5500/login.html')
         else:
             return Response({"message": "잘못된 링크입니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
+# ================================ 회원가입 끝 ================================
+        
 
 
 # ================================ 로그인 ================================
@@ -85,7 +87,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-# ================================ 프로필 상세보기 ================================
+# ================================ 프로필 페이지 시작 ================================
 class ProfileView(APIView):
     permission_classes=[permissions.IsAuthenticated]
     def get_object(self, user_id):
@@ -111,9 +113,24 @@ class ProfileView(APIView):
         else:
             return Response({"message": "권한이 없습니다!"}, status=status.HTTP_403_FORBIDDEN)
         
+    # 회원 탈퇴
+    def delete(self,request):
+        user = request.user
+        datas=request.data
+        datas["is_active"]=False
+        serializer = UserDelSerializer(user,data=datas)
+        if user.check_password(request.data.get("password")):
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message":"삭제완료!"}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"message":f"패스워드가 다릅니다"}, status=status.HTTP_400_BAD_REQUEST)
+        
+# ================================ 프로필 페이지 끝 ================================
 
 
-# ================================ 비밀번호 찾기 ================================
+
+# ================================ 비밀번호 재설정 시작 ================================
 
 # 이메일 보내기
 class PasswordResetView(APIView):
@@ -165,3 +182,5 @@ class ObtainUserTokenView(APIView):
             token, _ = Token.objects.get_or_create(user=user)
             return Response({"token": token.key}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# ================================ 비밀번호 재설정 끝 ================================

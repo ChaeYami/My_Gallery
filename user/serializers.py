@@ -78,10 +78,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
-
-
-
-
 class EmailThread(threading.Thread):
 
     def __init__(self, email):
@@ -244,8 +240,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ("account", "nickname","email", "profile_img","followings","followers","hearted_count")
 
-    
 
-# 비밀번호 체크
-# class PasswordVerificationSerializer(serializers.Serializer):
-#     password = serializers.CharField(max_length=128)
+class UserDelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("is_active",)
+
+
+# 비밀번호 확인
+class PasswordVerificationSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=128)

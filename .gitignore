@@ -1,6 +1,13 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,python,visualstudiocode,django,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,python,visualstudiocode,django,pycharm
 
+
+**/migrations/*.py
+!**/migrations/__init__.py
+my_settings.py
+MyGallery\my_settings.py
+
+
 ### Django ###
 *.log
 *.pot
@@ -10,6 +17,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media
+migrations
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
 # in your Git repository. Update and uncomment the following line accordingly.
@@ -416,6 +424,7 @@ pyrightconfig.json
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+.vscode
 
 # Local History for Visual Studio Code
 .history/

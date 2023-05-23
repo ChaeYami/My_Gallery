@@ -15,49 +15,66 @@ from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from user.serializers import UserSerializer, CustomTokenObtainPairSerializer, UserDelSerializer, PasswordResetSerializer, SetNewPasswordSerializer, TokenSerializer, EmailThread, PasswordVerificationSerializer, UserUpdateSerializer
+from user.serializers import (
+    UserSerializer,
+    CustomTokenObtainPairSerializer,
+    UserDelSerializer,
+    PasswordResetSerializer,
+    SetNewPasswordSerializer,
+    TokenSerializer,
+    EmailThread,
+    PasswordVerificationSerializer,
+    UserUpdateSerializer,
+)
 
 from .models import User
 
+
 # ================================ 회원가입 시작 ================================
 class Util:
-
     @staticmethod
     def send_email(message):
-        email = EmailMessage(subject=message["email_subject"], body=message["email_body"], to=[
-                             message["to_email"]])
+        email = EmailMessage(
+            subject=message["email_subject"],
+            body=message["email_body"],
+            to=[message["to_email"]],
+        )
         EmailThread(email).start()
+
 
 # 가입 클릭 시 이메일 전송
 class SignupView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
-        try:
-            User.objects.get(email=email)
-            return Response({"message":"이미 존재하는 사용자의 이메일입니다.."},status=status.HTTP_400_BAD_REQUEST)
-        except:
-            serializer = UserSerializer(data=request.data)
-            if serializer.is_valid():
-                user = serializer.save()
-                
-                # 토큰 생성
-                uid = urlsafe_b64encode(force_bytes(user.pk))
-                token = PasswordResetTokenGenerator().make_token(user)
+        # try:
+        #     User.objects.get(email=email)
+        #     return Response({"message":"이미 존재하는 사용자의 이메일입니다.."},status=status.HTTP_400_BAD_REQUEST)
+        # except:
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
 
-                # 이메일 전송
-                email = user.email
-                authurl = f'http://localhost:8000/user/verify-email/{uid}/{token}/'
-                email_body = "이메일 인증" + authurl
-                message = {
-                    "email_body": email_body,
-                    "to_email": email,
-                    "email_subject": "이메일 인증",
-                }
-                Util.send_email(message)
+            # 토큰 생성
+            uid = urlsafe_b64encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
 
-                return Response({"message": "가입완료!"}, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+            # 이메일 전송
+            email = user.email
+            authurl = f"http://localhost:8000/user/verify-email/{uid}/{token}/"
+            email_body = "이메일 인증" + authurl
+            message = {
+                "email_body": email_body,
+                "to_email": email,
+                "email_subject": "이메일 인증",
+            }
+            Util.send_email(message)
+
+            return Response({"message": "가입완료!"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(
+                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
 
 # 이메일 인증
 class VerifyEmailView(APIView):
@@ -76,12 +93,14 @@ class VerifyEmailView(APIView):
             user.is_active = True
             user.save()
             # return Response({"message": "이메일 인증이 완료되었습니다."}, status=status.HTTP_200_OK)
-            return redirect ('http://127.0.0.1:5500/login.html')
+            return redirect("http://127.0.0.1:5500/login.html")
         else:
-            return Response({"message": "잘못된 링크입니다."}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {"message": "잘못된 링크입니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
 # ================================ 회원가입 끝 ================================
-        
 
 
 # ================================ 로그인 ================================
@@ -91,7 +110,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 # ================================ 프로필 페이지 시작 ================================
 class ProfileView(APIView):
-    permission_classes=[permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+
     def get_object(self, user_id):
         return get_object_or_404(User, id=user_id)
 
@@ -105,38 +125,41 @@ class ProfileView(APIView):
     def patch(self, request, user_id):
         user = self.get_object(user_id)
         if user == request.user:
-            serializer = UserUpdateSerializer(
-                user, data=request.data, partial=True)
+            serializer = UserUpdateSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response({"message": "수정완료!"}, status=status.HTTP_200_OK)
             else:
-                return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+                )
         else:
             return Response({"message": "권한이 없습니다!"}, status=status.HTTP_403_FORBIDDEN)
-        
+
     # 회원 탈퇴 (비밀번호 받아서)
-    def delete(self,request):
+    def delete(self, request):
         user = request.user
-        datas=request.data
-        datas["is_active"]=False
-        serializer = UserDelSerializer(user,data=datas)
+        datas = request.data
+        datas["is_active"] = False
+        serializer = UserDelSerializer(user, data=datas)
         if user.check_password(request.data.get("password")):
             if serializer.is_valid():
                 serializer.save()
-                return Response({"message":"삭제완료!"}, status=status.HTTP_204_NO_CONTENT)
+                return Response({"message": "삭제완료!"}, status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response({"message":f"패스워드가 다릅니다"}, status=status.HTTP_400_BAD_REQUEST)
-        
-# ================================ 프로필 페이지 끝 ================================
+            return Response(
+                {"message": f"패스워드가 다릅니다"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
+
+# ================================ 프로필 페이지 끝 ================================
 
 
 # ================================ 비밀번호 재설정 시작 ================================
 
+
 # 이메일 보내기
 class PasswordResetView(APIView):
-
     def post(self, request):
         serializer = PasswordResetSerializer(data=request.data)
         if serializer.is_valid():
@@ -146,23 +169,27 @@ class PasswordResetView(APIView):
 
 # 비밀번호 재설정 토큰 확인
 class PasswordTokenCheckView(APIView):
-
     def get(self, request, uidb64, token):
         try:
             user_id = force_str(urlsafe_b64decode(uidb64))
             user = get_object_or_404(User, id=user_id)
             if not PasswordResetTokenGenerator().check_token(user, token):
-                return Response({"message": "링크가 유효하지 않습니다."}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(
+                    {"message": "링크가 유효하지 않습니다."}, status=status.HTTP_401_UNAUTHORIZED
+                )
 
-            return Response({"uidb64": uidb64, "token": token}, status=status.HTTP_200_OK)
+            return Response(
+                {"uidb64": uidb64, "token": token}, status=status.HTTP_200_OK
+            )
 
         except DjangoUnicodeDecodeError as identifier:
-            return Response({"message": "링크가 유효하지 않습니다."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"message": "링크가 유효하지 않습니다."}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 # 비밀번호 재설정
 class SetNewPasswordView(APIView):
-
     def put(self, request):
         serializer = SetNewPasswordSerializer(data=request.data)
         if serializer.is_valid():
@@ -172,10 +199,8 @@ class SetNewPasswordView(APIView):
 
 # 회원정보 인증 토큰 발급
 class ObtainUserTokenView(APIView):
-
     def post(self, request):
-        serializer = TokenSerializer(
-            data=request.data, context={"request": request})
+        serializer = TokenSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             user = authenticate(
                 email=serializer.validated_data["email"],
@@ -185,8 +210,8 @@ class ObtainUserTokenView(APIView):
             return Response({"token": token.key}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# ================================ 비밀번호 재설정 끝 ================================
 
+# ================================ 비밀번호 재설정 끝 ================================
 
 
 # ================================ 팔로우 시작 ================================
@@ -205,5 +230,6 @@ class FollowView(APIView):
                 return Response("follow", status=status.HTTP_200_OK)
         else:
             return Response("자신을 팔로우 할 수 없습니다.", status=status.HTTP_403_FORBIDDEN)
+
 
 # ================================= 팔로우 끝 =================================

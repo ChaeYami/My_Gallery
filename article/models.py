@@ -26,8 +26,14 @@ class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
     title = models.CharField(max_length=50, verbose_name="제목")
     content = models.TextField(verbose_name="내용")
+    hearts = models.ManyToManyField(Users,blank = True, related_name= 'hearts')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성시간")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="수정시간")
+
+    #---------------- 좋아요 갯수 ----------------
+    def count_hearts(self):
+        return self.hearts.count()
+
 
     # 이미지
     uploaded_image = models.ImageField(

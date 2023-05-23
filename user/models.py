@@ -39,6 +39,7 @@ class User(AbstractBaseUser):
     nickname = models.CharField("닉네임", max_length=15)
     profile_img = models.ImageField("프로필사진",blank=True,)
     introduce = models.TextField("소개", blank=True, null=True)
+    joined_at = models.DateTimeField(auto_now=True)
    
     followings = models.ManyToManyField("self", symmetrical=False, related_name='followers', blank=True)
 

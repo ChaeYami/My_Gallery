@@ -22,6 +22,7 @@ urlpatterns = [
     # path("password/check/", views.PasswordTokenCheckView.as_view(), name="password_reset_confirm"),  # /user/password/check/ 비밀번호 재설정 토큰 확인
     # path("password/reset/", views.SetNewPasswordView.as_view(), name="password_reset_confirm"),  # /user/password/reset/ 비밀번호 재설정
 
+    path('<int:user_id>/follow/', views.FollowView.as_view(), name='follow_view'), # user/<int:user_id>/follow/
     
 
 ] 

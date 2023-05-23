@@ -22,6 +22,10 @@ from django.conf import settings
 
 
 class UserSerializer(serializers.ModelSerializer):
+    joined_at = serializers.SerializerMethodField()
+    
+    def get_joined_at(self, obj):
+        return obj.joined_at.strftime("%Y년 %m월 %d일 %p %I:%M")
     class Meta:
         model = User
         fields = "__all__"

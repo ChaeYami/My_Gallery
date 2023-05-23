@@ -48,9 +48,7 @@ class Comment(models.Model):
         ordering = ["-comment_created_at"]  # 댓글 최신순 정렬
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    article = models.ForeignKey(
-        Article, on_delete=models.CASCADE, related_name="comment"
-    )
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="comment")
     comment = models.TextField("댓글")
     comment_created_at = models.DateTimeField(auto_now_add=True)
 

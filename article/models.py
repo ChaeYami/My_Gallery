@@ -5,7 +5,7 @@ from uuid import uuid4
 from datetime import date
 
 
-# 프로필 파일 이름 uuid형식으로 바꾸기
+# 이미지 파일 이름 uuid형식으로 바꾸기
 def rename_imagefile_to_uuid(instance, filename):
     now = date.today()
     upload_to = f"article/{now.year}/{now.month}/{now.day}/{instance}"
@@ -26,14 +26,13 @@ class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
     title = models.CharField(max_length=50, verbose_name="제목")
     content = models.TextField(verbose_name="내용")
-    hearts = models.ManyToManyField(User,blank = True, related_name= 'hearts')
+    hearts = models.ManyToManyField(User, blank=True, related_name="hearts")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성시간")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="수정시간")
 
-    #---------------- 좋아요 갯수 ----------------
+    # ---------------- 좋아요 갯수 ----------------
     def count_hearts(self):
         return self.hearts.count()
-
 
     # 이미지
     uploaded_image = models.ImageField(
@@ -54,7 +53,9 @@ class Comment(models.Model):
         ordering = ["-comment_created_at"]  # 댓글 최신순 정렬
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="comment")
+    article = models.ForeignKey(
+        Article, on_delete=models.CASCADE, related_name="comment"
+    )
     comment = models.TextField("댓글")
     comment_created_at = models.DateTimeField(auto_now_add=True)
 

@@ -9,7 +9,12 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from rest_framework import serializers, exceptions
 from user.models import User
-from user.validators import password_validator, password_pattern, account_validator, nickname_validator
+from user.validators import (
+    password_validator,
+    password_pattern,
+    account_validator,
+    nickname_validator,
+)
 
 import threading
 
@@ -17,8 +22,13 @@ from django.conf import settings
 
 
 class UserSerializer(serializers.ModelSerializer):
+    joined_at = serializers.SerializerMethodField()
+    
+    def get_joined_at(self, obj):
+        return obj.joined_at.strftime("%Y년 %m월 %d일 %p %I:%M")
     class Meta:
         model = User
+        fields = "__all__"
         extra_kwargs = {
             "account": {
                 "error_messages": {
@@ -47,21 +57,28 @@ class UserSerializer(serializers.ModelSerializer):
                 "write_only": True,
             },
         }
+
     def validate(self, data):
         account = data.get("account")
         password = data.get("password")
 
         # 아이디 유효성 검사
         if account_validator(account):
-            raise serializers.ValidationError(detail={"username": "아이디는 5자 이상 20자 이하의 숫자, 영문 대/소문자를 포함하여야 합니다."})
+            raise serializers.ValidationError(
+                detail={"username": "아이디는 5자 이상 20자 이하의 숫자, 영문 대/소문자를 포함하여야 합니다."}
+            )
 
         # 비밀번호 유효성 검사
         if password_validator(password):
-            raise serializers.ValidationError(detail={"password": "비밀번호는 8자 이상의 영문 대소문자와 숫자, 특수문자를 포함하여야 합니다."})
+            raise serializers.ValidationError(
+                detail={"password": "비밀번호는 8자 이상의 영문 대소문자와 숫자, 특수문자를 포함하여야 합니다."}
+            )
 
         # 비밀번호 유효성 검사
         if password_pattern(password):
-            raise serializers.ValidationError(detail={"password": "비밀번호는 연속해서 3자리 이상 동일한 영문,숫자,특수문자 사용이 불가합니다."})
+            raise serializers.ValidationError(
+                detail={"password": "비밀번호는 연속해서 3자리 이상 동일한 영문,숫자,특수문자 사용이 불가합니다."}
+            )
 
         return data
 
@@ -80,6 +97,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+
 # 회원정보 수정 serializer
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -93,12 +111,15 @@ class UserUpdateSerializer(serializers.ModelSerializer):
                 }
             },
         }
+
     def validate(self, data):
         nickname = data.get("nickname")
 
         # 닉네임 유효성 검사
         if nickname_validator(nickname):
-            raise serializers.ValidationError(detail={"nickname": "닉네임은 2자이상 8자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
+            raise serializers.ValidationError(
+                detail={"nickname": "닉네임은 2자이상 8자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."}
+            )
 
         return data
 
@@ -116,6 +137,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+
 # 로그인 토큰 serializer
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -125,6 +147,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["account"] = user.account
         token["nickname"] = user.nickname
         return token
+
 
 # ===========================================================
 class EmailThread(threading.Thread):
@@ -145,7 +168,10 @@ class Util:
             to=[message["to_email"]],
         )
         EmailThread(email).start()
+
+
 # ===========================================================
+
 
 # 비밀번호 찾기 serializer
 class PasswordResetSerializer(serializers.Serializer):

@@ -25,6 +25,7 @@ class UserManager(BaseUserManager):
             **extra_fields
         )
         user.is_admin = True
+        user.is_active = True
         user.save(using=self._db)
         return user
 
@@ -41,7 +42,7 @@ class User(AbstractBaseUser):
    
     followings = models.ManyToManyField("self", symmetrical=False, related_name='followers', blank=True)
 
-    is_active = models.BooleanField("활성화", default=False) # 이메일 인증 전에는 비활성화
+    is_active = models.BooleanField("활성화", default=True) # 이메일 인증 전에는 비활성화
     is_staff = models.BooleanField("스태프", default=False)
     is_admin = models.BooleanField("관리자", default=False)
 

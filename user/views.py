@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from user.serializers import UserSerializer, CustomTokenObtainPairSerializer, UserProfileSerializer, UserDelSerializer, PasswordResetSerializer, SetNewPasswordSerializer, TokenSerializer, EmailThread, PasswordVerificationSerializer
+from user.serializers import UserSerializer, CustomTokenObtainPairSerializer, UserDelSerializer, PasswordResetSerializer, SetNewPasswordSerializer, TokenSerializer, EmailThread, PasswordVerificationSerializer, UserUpdateSerializer
 
 from .models import User
 
@@ -96,14 +96,14 @@ class ProfileView(APIView):
     # 프로필 페이지
     def get(self, request, user_id):
         user = self.get_object(user_id)
-        serializer = UserProfileSerializer(user)
+        serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # 프로필 수정
     def patch(self, request, user_id):
         user = self.get_object(user_id)
         if user == request.user:
-            serializer = UserProfileSerializer(
+            serializer = UserUpdateSerializer(
                 user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -113,7 +113,7 @@ class ProfileView(APIView):
         else:
             return Response({"message": "권한이 없습니다!"}, status=status.HTTP_403_FORBIDDEN)
         
-    # 회원 탈퇴
+    # 회원 탈퇴 (비밀번호 받아서)
     def delete(self,request):
         user = request.user
         datas=request.data

@@ -1,23 +1,22 @@
 from rest_framework import serializers
-from .models import Article, Comments
+from .models import Article, Comment
 
-class CommentsSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     comment_created_at = serializers.DateTimeField(format='%Y-%m-%d', read_only=True)
-    comment_updated_at = serializers.DateTimeField(format='%Y-%m-%d', read_only=True)
 
     def get_user(self, obj):
         return {'nickname': obj.user.nickname, 'pk': obj.user.pk}
 
     class Meta:
-        model = Comments
+        model = Comment
         exclude = ('article',)  # 게시글 필드 빼고 보여주기
 
 
-# comments작성
-class CommentsCreateSerializer(serializers.ModelSerializer):
+# comment작성
+class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comments
+        model = Comment
         fields = ("comment",)
 
 

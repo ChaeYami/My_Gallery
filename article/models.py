@@ -40,11 +40,12 @@ class Article(models.Model):
     def __str__(self):
         return str(self.title)
 
+
 # 댓글 models
 class Comment(models.Model):
     class Meta:
-        db_table = 'comment'
-        ordering = ['-comment_created_at']  # 댓글 최신순 정렬
+        db_table = "comment"
+        ordering = ["-comment_created_at"]  # 댓글 최신순 정렬
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="comment")

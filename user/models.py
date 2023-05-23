@@ -16,7 +16,9 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+
         user = self.create_user(email=email, password=password, **extra_fields)
+
         user.is_admin = True
         user.is_active = True
         user.save(using=self._db)
@@ -36,6 +38,7 @@ class User(AbstractBaseUser):
         blank=True,
     )
     introduce = models.TextField("소개", blank=True, null=True)
+
 
     followings = models.ManyToManyField(
         "self", symmetrical=False, related_name="followers", blank=True

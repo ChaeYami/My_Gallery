@@ -9,6 +9,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from rest_framework import serializers, exceptions
 from user.models import User
+from user.validators import password_validator, password_pattern, account_validator, nickname_validator
 
 import threading
 
@@ -18,19 +19,52 @@ from django.conf import settings
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        exclude = ("followings",)
         extra_kwargs = {
-            "password":{
-                "write_only":True,
+            "account": {
+                "error_messages": {
+                    "required": "ID는 필수 입력 사항입니다.",
+                    "blank": "ID는 필수 입력 사항입니다.",
+                }
             },
-            "is_admin":{
-                "write_only":True,
+            "password": {
+                "write_only": True,
+                "error_messages": {
+                    "required": "비밀번호는 필수 입력 사항입니다.",
+                    "blank": "비밀번호는 필수 입력 사항입니다.",
+                },
             },
-            "is_active":{
-                "write_only":True,
-            }
+            "email": {
+                "error_messages": {
+                    "required": "email은 필수 입력 사항입니다.",
+                    "invalid": "email 형식이 맞지 않습니다. 알맞은 형식의 email을 입력해주세요.",
+                    "blank": "email은 필수 입력 사항입니다.",
+                }
+            },
+            "is_admin": {
+                "write_only": True,
+            },
+            "is_active": {
+                "write_only": True,
+            },
         }
-        
+    def validate(self, data):
+        account = data.get("account")
+        password = data.get("password")
+
+        # 아이디 유효성 검사
+        if account_validator(account):
+            raise serializers.ValidationError(detail={"username": "아이디는 5자 이상 20자 이하의 숫자, 영문 대/소문자를 포함하여야 합니다."})
+
+        # 비밀번호 유효성 검사
+        if password_validator(password):
+            raise serializers.ValidationError(detail={"password": "비밀번호는 8자 이상의 영문 대소문자와 숫자, 특수문자를 포함하여야 합니다."})
+
+        # 비밀번호 유효성 검사
+        if password_pattern(password):
+            raise serializers.ValidationError(detail={"password": "비밀번호는 연속해서 3자리 이상 동일한 영문,숫자,특수문자 사용이 불가합니다."})
+
+        return data
+
     # 회원가입
     def create(self, validated_data):
         user = super().create(validated_data)
@@ -38,8 +72,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
-    
-    # 로그인
+
     def update(self, instance, validated_data):
         user = super().update(instance, validated_data)
         password = user.password
@@ -47,39 +80,54 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-
+# 회원정보 수정 serializer
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("nickname","profile_img","introduce")
+        fields = ("nickname", "profile_img", "introduce")
+        extra_kwargs = {
+            "nickname": {
+                "error_messages": {
+                    "required": "닉네임을 입력해주세요.",
+                    "blank": "닉네임을 입력해주세요.",
+                }
+            },
+        }
+    def validate(self, data):
+        nickname = data.get("nickname")
 
-    def create(self, validated_data):
-        user = super().create(validated_data)
+        # 닉네임 유효성 검사
+        if nickname_validator(nickname):
+            raise serializers.ValidationError(detail={"nickname": "닉네임은 2자이상 8자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
+
+        return data
+
+    # def create(self, validated_data):
+    #     user = super().create(validated_data)
+    #     password = user.password
+    #     user.set_password(password)
+    #     user.save()
+    #     return user
+
+    def update(self, instance, validated_data):
+        user = super().update(instance, validated_data)
         password = user.password
         user.set_password(password)
         user.save()
         return user
-    
-    def update(self,instance, validated_data):
-        user = super().update(instance,validated_data)
-        password = user.password
-        user.set_password(password)
-        user.save()
-        return user
 
-
+# 로그인 토큰 serializer
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['email'] = user.email
-        token['account'] = user.account
-        token['nickname'] = user.nickname
+        token["email"] = user.email
+        token["account"] = user.account
+        token["nickname"] = user.nickname
         return token
 
-
+# ===========================================================
 class EmailThread(threading.Thread):
-
     def __init__(self, email):
         self.email = email
         threading.Thread.__init__(self)
@@ -89,13 +137,15 @@ class EmailThread(threading.Thread):
 
 
 class Util:
-
     @staticmethod
     def send_email(message):
-        email = EmailMessage(subject=message["email_subject"], body=message["email_body"], to=[
-                             message["to_email"]])
+        email = EmailMessage(
+            subject=message["email_subject"],
+            body=message["email_body"],
+            to=[message["to_email"]],
+        )
         EmailThread(email).start()
-
+# ===========================================================
 
 # 비밀번호 찾기 serializer
 class PasswordResetSerializer(serializers.Serializer):
@@ -113,7 +163,9 @@ class PasswordResetSerializer(serializers.Serializer):
             token = PasswordResetTokenGenerator().make_token(user)
 
             frontend_site = "127.0.0.1:5500"
-            absurl = f"http://{frontend_site}/set_password.html?id=${uidb64}&token=${token}"
+            absurl = (
+                f"http://{frontend_site}/set_password.html?id=${uidb64}&token=${token}"
+            )
 
             email_body = "비밀번호 재설정 \n " + absurl
             message = {
@@ -127,7 +179,8 @@ class PasswordResetSerializer(serializers.Serializer):
 
         except User.DoesNotExist:
             raise serializers.ValidationError(
-                detail={"email": "잘못된 이메일입니다. 다시 입력해주세요."})
+                detail={"email": "잘못된 이메일입니다. 다시 입력해주세요."}
+            )
 
 
 # 비밀번호 재설정 serializer
@@ -169,7 +222,8 @@ class SetNewPasswordSerializer(serializers.Serializer):
                 raise exceptions.AuthenticationFailed("토큰이 유효하지 않습니다.", 401)
             if password != repassword:
                 raise serializers.ValidationError(
-                    detail={"repassword": "비밀번호가 일치하지 않습니다."})
+                    detail={"repassword": "비밀번호가 일치하지 않습니다."}
+                )
 
             user.set_password(password)
             user.save()
@@ -177,8 +231,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
             return super().validate(attrs)
 
         except User.DoesNotExist:
-            raise serializers.ValidationError(
-                detail={"user": "존재하지 않는 회원입니다."})
+            raise serializers.ValidationError(detail={"user": "존재하지 않는 회원입니다."})
 
 
 # 비밀번호 재설정 serializer
@@ -193,18 +246,13 @@ class SetNewPasswordSerializer(serializers.Serializer):
 #         user.set_password(password)
 #         user.save()
 #         return user
-    
+
 #     def update(self,instance, validated_data):
 #         user = super().update(instance,validated_data)
 #         password = user.password
 #         user.set_password(password)
 #         user.save()
 #         return user
-
-class UserDelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("is_active",)
 
 
 # User Token 획득
@@ -215,32 +263,7 @@ class TokenSerializer(serializers.Serializer):
     )
 
 
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    followings = serializers.StringRelatedField(many=True)
-    followers = serializers.StringRelatedField(many=True)
-    # articles_count = ArticlesSerializer  # 작성한 게시글
-    # hearted_articles_count = serializers.SerializerMethodField()  # 내가 하트한 수
-
-    profile_img = serializers.ImageField(
-        max_length=None,
-        use_url=True,
-        required=False,  # 입력값이 없어도 유효성 검사를 통과
-    )
-
-    def get_hearted_count(self, obj):
-        return obj.hearts.count()
-
-    def clean_img(self):
-        img = self.cleaned_data.get('profile_img')
-        if img and img.size > 2 * 1024 * 1024:  # 2mb
-            raise serializers.ValidationError('이미지 크기는 최대 2mb까지 가능해요.')
-        return img
-    class Meta:
-        model = User
-        fields = ("account", "nickname","email", "profile_img","followings","followers","hearted_count")
-
-
+# 회원탈퇴 serializer
 class UserDelSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

@@ -299,3 +299,16 @@ class UserDelSerializer(serializers.ModelSerializer):
 # 비밀번호 확인
 class PasswordVerificationSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128)
+
+
+# 팔로우/팔로워 
+class FollowSerializer(serializers.ModelSerializer):
+    followings = serializers.StringRelatedField(many = True)
+    followers = serializers.StringRelatedField(many = True)
+
+    def get_user(self, obj):
+        return obj.user.account
+
+    class Meta:
+        model = User
+        fields = ["followings", "followers"]

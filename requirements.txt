@@ -9,6 +9,8 @@ djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 mypy-extensions==1.0.0
 mysqlclient==2.1.1
+numpy==1.24.3
+opencv-python==4.7.0.72
 packaging==23.1
 pathspec==0.11.1
 Pillow==9.5.0

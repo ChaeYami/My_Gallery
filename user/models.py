@@ -39,7 +39,7 @@ class User(AbstractBaseUser):
     )
     introduce = models.TextField("소개", default=None ,blank=True, null=True)
     joined_at = models.DateTimeField(auto_now=True)
-
+    point = models.IntegerField("포인트", default=500)
 
     followings = models.ManyToManyField(
         "self", symmetrical=False, related_name="followers", blank=True

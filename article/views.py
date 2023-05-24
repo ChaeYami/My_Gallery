@@ -11,6 +11,7 @@ from article.serializers import (
     CommentSerializer,
     CommentCreateSerializer,
 )
+from user.models import User
 
 
 class ArticleView(APIView):
@@ -134,8 +135,8 @@ class HeartsListView(APIView):
             article.hearts.add(request.user)
             return Response('좋아요', status=status.HTTP_200_OK)
 
-    def get(self, request):
-        user = request.user
+    def get(self, request, user_id):
+        user = User.objects.get(id=user_id)
         article = user.hearts.all()
         serializer = ArticleSerializer(article, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

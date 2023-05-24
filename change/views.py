@@ -16,26 +16,26 @@ class TransformView(APIView):
     parser_classes = [parsers.MultiPartParser]
     permission_classes = [permissions.IsAuthenticated]
 
+    # .t7 파일 로드
+    model_dict = {
+        '1': cv2.dnn.readNetFromTorch('change/models/candy.t7'),
+        '2': cv2.dnn.readNetFromTorch('change/models/composition_vii.t7'),
+        '3': cv2.dnn.readNetFromTorch('change/models/feathers.t7'),
+        '4': cv2.dnn.readNetFromTorch('change/models/la_muse.t7'),
+        '5': cv2.dnn.readNetFromTorch('change/models/mosaic.t7'),
+        '6': cv2.dnn.readNetFromTorch('change/models/starry_night.t7'),
+        '7': cv2.dnn.readNetFromTorch('change/models/the_scream.t7'),
+        '8': cv2.dnn.readNetFromTorch('change/models/the_wave.t7'),
+        '9': cv2.dnn.readNetFromTorch('change/models/udnie.t7'),
+    }
+    
     def post(self, request, change_id, format=None):
         file_obj = request.FILES['image']
         # change_id = request.POST['change_id']
-
-        # .t7 파일 로드
-        model_dict = {
-            '1': 'change/models/candy.t7',
-            '2': 'change/models/composition_vii.t7',
-            '3': 'change/models/feathers.t7',
-            '4': 'change/models/la_muse.t7',
-            '5': 'change/models/mosaic.t7',
-            '6': 'change/models/starry_night.t7',
-            '7': 'change/models/the_scream.t7',
-            '8': 'change/models/the_wave.t7',
-            '9': 'change/models/udnie.t7',
-        }
-        model_path = model_dict.get(str(change_id))
-        if model_path is None:
-            return Response({'error': 'Invalid change_id'}, status=400)
-        net = cv2.dnn.readNetFromTorch(model_path)
+        
+        net = self.model_dict.get(str(change_id))
+        if net is None:
+            return Response({'error': 'Invalid change_id'}, status=status.HTTP_200_OK)
 
         # 이미지 전처리
         nparr = np.fromstring(file_obj.read(), np.uint8)

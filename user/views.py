@@ -240,3 +240,30 @@ class FollowView(APIView):
 
 
 # ================================= 팔로우 끝 =================================
+
+# 계정 재활성화
+class ActivateAccountView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        try:
+            user = User.objects.get(email=email, is_active=False)
+            # 유저가 비활성화된 상태인 경우에만 계정을 활성화할 수 있도록 검증합니다.
+            uid = urlsafe_b64encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
+            authurl = f"http://localhost:8000/user/verify-email/{uid}/{token}/"
+            email_body = "계정 재활성화를 위한 이메일 인증 링크입니다. " + authurl
+            message = {
+                "email_body": email_body,
+                "to_email": email,
+                "email_subject": "계정 재활성화 이메일 인증",
+            }
+            Util.send_email(message)
+            return Response(
+                {"message": "이메일을 통해 계정 재활성화 링크가 전송되었습니다."},
+                status=status.HTTP_200_OK,
+            )
+        except User.DoesNotExist:
+            return Response(
+                {"message": "비활성화된 상태가 아닌 계정입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

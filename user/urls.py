@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path('signup/', views.SignupView.as_view(), name='sign_up_view'), # /user/signup/
     path("verify-email/b'<str:uidb64>'/<str:token>/",views.VerifyEmailView.as_view(), name='verify-email'),# /user/verify-email/b'<str:uidb64>'/<str:token>/
+    path('reactivation/', views.ActivateAccountView.as_view(), name='reactivation'), # /user/reactivation/
     
     path('login/', views.CustomTokenObtainPairView.as_view(), name='login_view'), # /user/login/
     # path("refresh/", TokenRefreshView.as_view(), name="token_refresh"), # /user/refresh/
@@ -24,5 +25,4 @@ urlpatterns = [
 
     path('<int:user_id>/follow/', views.FollowView.as_view(), name='follow_view'), # user/<int:user_id>/follow/
     
-
-] 
+]

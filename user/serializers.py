@@ -23,9 +23,17 @@ from django.conf import settings
 
 class UserSerializer(serializers.ModelSerializer):
     joined_at = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
     
     def get_joined_at(self, obj):
-        return obj.joined_at.strftime("%Y년 %m월 %d일 %p %I:%M")
+        return obj.joined_at.strftime("%Y년 %m월 %d일")
+    
+    def get_followers_count(self, obj):
+        return obj.followers.count()
+    
+    def get_following_count(self, obj):
+        return obj.followings.count()
     class Meta:
         model = User
         fields = "__all__"

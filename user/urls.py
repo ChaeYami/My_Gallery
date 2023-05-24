@@ -25,4 +25,5 @@ urlpatterns = [
 
     path('<int:user_id>/follow/', views.FollowView.as_view(), name='follow_view'), # user/<int:user_id>/follow/
     
+    
 ]

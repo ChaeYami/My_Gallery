@@ -146,6 +146,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["account"] = user.account
         token["nickname"] = user.nickname
+        token["point"] = user.point
         return token
 
 

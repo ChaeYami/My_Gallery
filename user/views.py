@@ -111,7 +111,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 # ================================ 프로필 페이지 시작 ================================
 class ProfileView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self, user_id):
         return get_object_or_404(User, id=user_id)
@@ -138,15 +137,15 @@ class ProfileView(APIView):
             return Response({"message": "권한이 없습니다!"}, status=status.HTTP_403_FORBIDDEN)
 
     # 회원 탈퇴 (비밀번호 받아서)
-    def delete(self, request):
-        user = request.user
+    def delete(self, request, user_id):
+        user = self.get_object(user_id)
         datas = request.data
         datas["is_active"] = False
         serializer = UserDelSerializer(user, data=datas)
         if user.check_password(request.data.get("password")):
             if serializer.is_valid():
                 serializer.save()
-                return Response({"message": "삭제완료!"}, status=status.HTTP_204_NO_CONTENT)
+                return Response({"message": "계정 비활성화 완료"}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(
                 {"message": f"패스워드가 다릅니다"}, status=status.HTTP_400_BAD_REQUEST
@@ -241,3 +240,30 @@ class FollowView(APIView):
 
 
 # ================================= 팔로우 끝 =================================
+
+# 계정 재활성화
+class ActivateAccountView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        try:
+            user = User.objects.get(email=email, is_active=False)
+            # 유저가 비활성화된 상태인 경우에만 계정을 활성화할 수 있도록 검증합니다.
+            uid = urlsafe_b64encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
+            authurl = f"http://localhost:8000/user/verify-email/{uid}/{token}/"
+            email_body = "계정 재활성화를 위한 이메일 인증 링크입니다. " + authurl
+            message = {
+                "email_body": email_body,
+                "to_email": email,
+                "email_subject": "계정 재활성화 이메일 인증",
+            }
+            Util.send_email(message)
+            return Response(
+                {"message": "이메일을 통해 계정 재활성화 링크가 전송되었습니다."},
+                status=status.HTTP_200_OK,
+            )
+        except User.DoesNotExist:
+            return Response(
+                {"message": "비활성화된 상태가 아닌 계정입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

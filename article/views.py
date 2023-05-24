@@ -89,3 +89,43 @@ class CommentView(APIView):
             return Response(
                 {"message": "댓글 작성자만 삭제 가능."}, status=status.HTTP_403_FORBIDDEN
             )
+
+
+#------------------- 게시글 좋아요 ------------------- 
+
+class ArticleHeartsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, article_id):
+        article = get_object_or_404(Article, id=article_id)
+
+        if request.user in article.hearts.all():
+            article.hearts.remove(request.user)
+            return Response({"message": "좋아요를 취소했습니다."}, status=status.HTTP_200_OK)
+        else:
+            article.hearts.add(request.user)
+            return Response({"message": "좋아요를 눌렀습니다."}, status=status.HTTP_200_OK)
+
+#------------------- 게시글 좋아요 갯수 ------------------- 
+    def get(self, request, article_id):
+        article = Article.objects.get(id=article_id)
+        heart_count = article.count_hearts()
+        return Response({'hearts': heart_count})
+
+#--------------------- 게시글 좋아요 보기 ----------------------
+class HeartsListView(APIView):
+    def post(self, request, article_id):
+        article = get_object_or_404(Article, id=article_id)
+
+        if request.user in article.hearts.all():
+            article.hearts.remove(request.user)
+            return Response('좋아요 취소', status=status.HTTP_200_OK)
+        else:
+            article.hearts.add(request.user)
+            return Response('좋아요', status=status.HTTP_200_OK)
+
+    def get(self, request):
+        user = request.user
+        article = user.hearts.all()
+        serializer = ArticleSerializer(article, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

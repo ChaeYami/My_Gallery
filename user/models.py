@@ -37,7 +37,7 @@ class User(AbstractBaseUser):
         "프로필사진",
         blank=True,
     )
-    introduce = models.TextField("소개", blank=True, null=True)
+    introduce = models.TextField("소개", default=None ,blank=True, null=True)
     joined_at = models.DateTimeField(auto_now=True)
 
 

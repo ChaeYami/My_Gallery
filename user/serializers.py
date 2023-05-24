@@ -25,6 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
     joined_at = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
+    followings = serializers.StringRelatedField(many=True)
+    followers = serializers.StringRelatedField(many=True)
     
     def get_joined_at(self, obj):
         return obj.joined_at.strftime("%Y년 %m월 %d일")

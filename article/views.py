@@ -91,25 +91,20 @@ class CommentView(APIView):
             )
 
 
-
-
 #------------------- 게시글 좋아요 ------------------- 
-# 게시글 좋아요 등록, 취소
+
 class ArticleHeartsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-	#인증된 사용자만 접근
+
     def post(self, request, article_id):
-        # 요청된 article_id를 가진 게시글을 찾는다.
         article = get_object_or_404(Article, id=article_id)
-        try:
-            articlehearts = ArticleHearts.objects.get(article=article, user=request.user)
-            articlehearts.delete()
-            return Response({"message": "좋아요를 취소했습니다"}, status=status.HTTP_200_OK)
 
-        except ArticleHearts.DoesNotExist: #<- 에러가 발생했을 찾기 쉽다. 
-            articlehearts = ArticleHearts.objects.create(article=article, user=request.user)
-            return Response({"message": "좋아요를 눌렀습니다"}, status=status.HTTP_200_OK)
-
+        if request.user in article.hearts.all():
+            article.hearts.remove(request.user)
+            return Response({"message": "좋아요를 취소했습니다."}, status=status.HTTP_200_OK)
+        else:
+            article.hearts.add(request.user)
+            return Response({"message": "좋아요를 눌렀습니다."}, status=status.HTTP_200_OK)
 
 #------------------- 게시글 좋아요 갯수 ------------------- 
     def get(self, request, article_id):
@@ -117,17 +112,15 @@ class ArticleHeartsView(APIView):
         heart_count = article.count_hearts()
         return Response({'hearts': heart_count})
 
-
-
 #--------------------- 게시글 좋아요 보기 ----------------------
 class HeartsListView(APIView):
     def post(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
-    
-        try:
+
+        if request.user in article.hearts.all():
             article.hearts.remove(request.user)
             return Response('좋아요 취소', status=status.HTTP_200_OK)
-        except HeartsList.DoesNotExist:
+        else:
             article.hearts.add(request.user)
             return Response('좋아요', status=status.HTTP_200_OK)
 

@@ -25,6 +25,7 @@ from user.serializers import (
     EmailThread,
     PasswordVerificationSerializer,
     UserUpdateSerializer,
+    FollowSerializer,
 )
 
 from .models import User
@@ -93,7 +94,7 @@ class VerifyEmailView(APIView):
             user.is_active = True
             user.save()
             # return Response({"message": "이메일 인증이 완료되었습니다."}, status=status.HTTP_200_OK)
-            return redirect("http://127.0.0.1:5500/login.html")
+            return redirect("http://127.0.0.1:5500/user/login.html")
         else:
             return Response(
                 {"message": "잘못된 링크입니다."}, status=status.HTTP_400_BAD_REQUEST
@@ -218,6 +219,7 @@ class ObtainUserTokenView(APIView):
 class FollowView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    # 팔로우 등록/취소
     def post(self, request, user_id):
         you = get_object_or_404(User, id=user_id)
         me = request.user
@@ -230,6 +232,12 @@ class FollowView(APIView):
                 return Response("follow", status=status.HTTP_200_OK)
         else:
             return Response("자신을 팔로우 할 수 없습니다.", status=status.HTTP_403_FORBIDDEN)
+
+    # 팔로우/팔로워 리스트
+    def get(self, request, user_id):
+        followings = User.objects.filter(id=user_id)
+        serializer = FollowSerializer(followings, many=True)
+        return Response(serializer.data)
 
 
 # ================================= 팔로우 끝 =================================

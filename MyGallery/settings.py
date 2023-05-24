@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "user",
     "article",
+    "change",
 ]
 
 REST_FRAMEWORK = {
@@ -77,7 +78,6 @@ WSGI_APPLICATION = "MyGallery.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = my_settings.DATABASES
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

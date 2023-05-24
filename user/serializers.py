@@ -148,6 +148,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["nickname"] = user.nickname
         token["point"] = user.point
         return token
+    
+    def get_user(self, validated_data):
+        user = self.user
+        return user
 
 
 # ===========================================================

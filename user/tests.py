@@ -104,3 +104,24 @@ class CustomTokenObtainPairViewTest(APITestCase):
     #     response = self.client.delete(url, datas=delete_data)
     #     print(response.data)
     #     self.assertEqual(response.status_code, 204)
+
+
+class FollowViewTest(APITestCase):        
+    def setUp(self):            
+            self.user = User.objects.create_user(email='hil02165@naver.com', account='admin', nickname='admin', password='G1843514dadg23@')
+            self.user_1 = User.objects.create_user(email='adgdsa@naver.com', account='badf', nickname='adasdfmin', password='G184351dsa4dadg23@')
+            self.user_2 = User.objects.create_user(email='asdgbvds@naver.com', account='admadsbvsain', nickname='adewrfmin', password='G184351fd4dadg23@')
+            self.user_3 = User.objects.create_user(email='sadg@naver.com', account='eqwr', nickname='asdg', password='G184351f@!$g23@')
+
+            self.user.followings.add(self.user_1, self.user_2)  # self.user가 팔로우 진행
+            self.user.followers.add(self.user_1, self.user_2) # self.user를 팔로우 진행
+
+            self.client.force_authenticate(user=self.user) # force_authenticate 인증된 사용자로 로그인
+
+    # 팔로우 등록 실패(나 자신 팔로우 진행) 테스트 코드
+    def test_follow_fail(self):
+        user_id = self.user.id
+        url = reverse("follow_view", kwargs={"user_id": user_id})
+        response = self.client.post(url)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)

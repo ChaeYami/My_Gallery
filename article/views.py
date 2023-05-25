@@ -30,15 +30,12 @@ class ArticleView(APIView):
 
 
 class ArticleDetailView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
-        if request.user == article.user:
-            serializer = ArticleSerializer(article)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response("권한이 없습니다.", status=status.HTTP_403_FORBIDDEN)
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
@@ -72,7 +69,7 @@ class ArticleListView(APIView):  # /article/list/<int:user_id>/
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CommentView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     # ===================== 댓글 목록 보기 =========================
     def get(self, request, article_id):

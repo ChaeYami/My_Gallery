@@ -108,7 +108,7 @@ class CustomTokenObtainPairViewTest(APITestCase):
 
 class FollowViewTest(APITestCase):        
     def setUp(self):            
-            self.user = User.objects.create_user(email='hil02165@naver.com', account='admin', nickname='admin', password='G1843514dadg23@')
+            self.user = User.objects.create_user(email='sdgasdf@naver.com', account='admin', nickname='admin', password='G1843514dadg23@')
             self.user_1 = User.objects.create_user(email='adgdsa@naver.com', account='badf', nickname='adasdfmin', password='G184351dsa4dadg23@')
             self.user_2 = User.objects.create_user(email='asdgbvds@naver.com', account='admadsbvsain', nickname='adewrfmin', password='G184351fd4dadg23@')
             self.user_3 = User.objects.create_user(email='sadg@naver.com', account='eqwr', nickname='asdg', password='G184351f@!$g23@')
@@ -149,3 +149,18 @@ class FollowViewTest(APITestCase):
     #     response = self.client.get(url)
     #     print(response.data)
     #     self.assertEqual(response.status_code, 200)
+
+
+class PasswordResetViewTest(APITestCase):
+    def setUp(self):            
+        self.user = User.objects.create_user(email='sdgasdf@naver.com', account='admin', nickname='admin', password='G1843514dadg23@')
+        self.client.force_authenticate(user=self.user) # force_authenticate 인증된 사용자로 로그인
+
+    # 비밀번호 재설정 이메일 보내기 테스트 코드
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_password_reset_email_send(self):
+        url = reverse("password_reset")
+        password_reset_data = {'email' : 'sdgasdf@naver.com'}
+        response = self.client.post(url, password_reset_data)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)

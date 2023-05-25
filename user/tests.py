@@ -76,3 +76,17 @@ class CustomTokenObtainPairViewTest(APITestCase):
         response = self.client.get(url)
         print(response.data)
         self.assertEqual(response.status_code, 200)
+
+    # 프로필 페이지 수정 테스트 코드
+    def test_profil_update(self):
+        user_id = self.user.id
+        url = reverse("profile_view", kwargs={"user_id": user_id})
+        update_data = {
+            "nickname" : "nick",
+            "introduce": "안녕하십니까!"
+        }
+
+        response = self.client.force_authenticate(user=self.user) # force_authenticate 인증된 사용자로 변경
+        response = self.client.patch(url, update_data)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)

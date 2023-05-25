@@ -45,3 +45,25 @@ class VerifyEmailViewTest(APITestCase):
 
         self.user.refresh_from_db()  # 사용자 데이터 다시 불러오기
         self.assertTrue(self.user.is_active)  # 사용자가 활성화 상태인지 확인
+
+
+class CustomTokenObtainPairViewTest(APITestCase):
+    # setUp 함수 : 테스트 코드 실행 전에 실행하겠다.(유저 생성)
+    def setUp(self):            
+        self.user = User.objects.create_user(email='sdgasdf@naver.com',
+                                             account='admin',
+                                             nickname='admin',
+                                             password='G1843514dadg23@')
+        self.user.is_active = True # 활성화
+        self.user.save()
+
+    # 로그인 테스트 코드
+    def test_login(self):
+        url = reverse("login_view")
+        login_data = {
+            'account': 'admin',
+            'password': 'G1843514dadg23@'
+        }
+        response = self.client.post(url, login_data)
+        print(response.data)
+        self.assertEqual(response.status_code, 200) # 로그인 요청이 성공적으로 처리되었는지 확인

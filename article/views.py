@@ -11,6 +11,7 @@ from article.serializers import (
     CommentSerializer,
     CommentCreateSerializer,
 )
+from user.models import User
 
 
 class ArticleView(APIView):
@@ -58,7 +59,17 @@ class ArticleDetailView(APIView):
             return Response({"message": "삭제완료!"}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response("권한이 없습니다.", status=status.HTTP_403_FORBIDDEN)
+        
+        
+# =================== 글 리스트 목록 ===================
 
+
+class ArticleListView(APIView):  # /article/list/<int:user_id>/
+    def get(self, request, user_id):  # => request.method == 'GET':
+        articles = Article.objects.filter(user_id=user_id)
+        serializer = ArticleSerializer(articles, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CommentView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -124,8 +135,8 @@ class HeartsListView(APIView):
             article.hearts.add(request.user)
             return Response('좋아요', status=status.HTTP_200_OK)
 
-    def get(self, request):
-        user = request.user
+    def get(self, request, user_id):
+        user = User.objects.get(id=user_id)
         article = user.hearts.all()
         serializer = ArticleSerializer(article, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

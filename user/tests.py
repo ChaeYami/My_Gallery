@@ -133,3 +133,11 @@ class FollowViewTest(APITestCase):
         response = self.client.post(url)
         print(response.data)
         self.assertEqual(response.status_code, 200)
+
+    # # 팔로우 취소 테스트 코드
+    # def test_follow_cancel(self):
+    #     user_id = 2
+    #     url = reverse("follow_view", kwargs={"user_id": user_id})
+    #     response = self.client.post(url)
+    #     print(response.data)
+    #     self.assertEqual(response.status_code, 200)

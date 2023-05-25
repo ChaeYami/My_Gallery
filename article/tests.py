@@ -239,5 +239,110 @@ class ArticleDetailViewTest(APITestCase):
 
 
 
+# -------------------------  Comment 생성 조회 -------------------------
+
+class CommentViewTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.email = 'ark375@naver.com'
+        cls.nickname = 'admin'
+        cls.account = 'admin'
+        cls.password = 'G1843514dadg23!4'
+        cls.user_data = {'account':'admin','email':'ark375@naver.com','password':'G1843514dadg23!4'}
+        cls.article_data = {"title": "test Title", "content": "test content"}
+        cls.comment_data = {"comment": "test comment"}
+        cls.user = User.objects.create_user(account=cls.account, email=cls.email, nickname=cls.nickname, password=cls.password)
+        cls.article = Article.objects.create(**cls.article_data, user=cls.user)
+
+    def setUp(self):
+        # self.access_token = self.client.post(reverse("user:login_view"), self.user_data).data["access"]
+        self.client.force_authenticate(user=self.user)
+
+
+
+
+    #------------------------ Comment 작성 ------------------------
+    
+    
+    def test_create_article_success(self):
+        response = self.client.post(
+            path=reverse("articles:comment_view", kwargs={"article_id": self.article.id}),
+            data=self.comment_data,
+            # HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+        )
+        print(response)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(Comment.objects.get().comment, self.comment_data["comment"])
+
+
+    #------------------------- Comment리스트 -----------------------
+    
+    def test_comment_list(self):
+        self.comments = []
+        for _ in range(5):
+            self.comments.append(
+                Comment.objects.create(
+                    comment="comment", article=self.article, user=self.user
+                )
+            )
+        response = self.client.get(
+            path=reverse("articles:comment_view", kwargs={"article_id": self.article.id}),
+            # HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Comment.objects.count(), 5)
+        self.assertEqual(len(response.data), 5)
+        self.assertEqual(response.data[0]["comment"], "comment")
+
+
+#--------------------- Comment, 삭제 ---------------------
+class CommentDetailViewTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.email = 'ark375@naver.com'
+        cls.nickname = 'admin'
+        cls.account = 'admin'
+        cls.password = 'G1843514dadg23!4'
+        cls.user_data = {'account':'admin','email':'ark375@naver.com','password':'G1843514dadg23!4'}
+        cls.article_data = {"title": "test Title", "content": "test content"}
+        cls.comment_data = {"comment": "test comment"}
+        cls.user = User.objects.create_user(account=cls.account, email=cls.email, nickname=cls.nickname, password=cls.password)
+        cls.article = Article.objects.create(**cls.article_data, user=cls.user)
+        cls.comment_data = [
+            {"content": "test 1"},
+            {"content": "test 2"},
+            {"content": "test 3"},
+            {"content": "test 4"},
+            {"content": "test 5"},
+        ]
+       
+        cls.comment = []
+        for _ in range(5):
+            cls.comment.append(
+                Comment.objects.create(
+                    comment="comment", article=cls.article, user=cls.user
+                )
+            )
+
+    def setUp(self):
+        # self.access_token = self.client.post(reverse("token_obtain_pair"), self.user_data).data["access"]
+        self.client.force_authenticate(user=self.user)
+
+    
+   
+        # 코멘트 삭제
+    def test_comment_delete(self):
+        comment_id = self.comment[0].id  # 삭제할 댓글의 ID
+        response = self.client.delete(
+            path=reverse("articles:comment_delete", kwargs={"comment_id": comment_id}),
+            # HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+        )
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Comment.objects.count(), 4)
+        self.assertEqual(response.data, {'message': '삭제완료!'})
+
+
 
 

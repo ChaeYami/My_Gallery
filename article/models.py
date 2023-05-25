@@ -33,7 +33,7 @@ class Article(models.Model):
     #---------------- 좋아요 갯수 ----------------
     def count_hearts(self):
         return self.hearts.count()
-
+    #---------------- 테스트 코드 함수 --------------
     def get_absolute_url(self):
         return reverse('articles:article_detail_view', kwargs={"article_id": self.pk})
 

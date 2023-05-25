@@ -15,6 +15,8 @@ from user.models import User
 
 
 class ArticleView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request):
         articles = Article.objects.all().order_by("-created_at")
         serializer = ArticleListSerializer(articles, many=True)
@@ -30,15 +32,12 @@ class ArticleView(APIView):
 
 
 class ArticleDetailView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
-        if request.user == article.user:
-            serializer = ArticleSerializer(article)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response("권한이 없습니다.", status=status.HTTP_403_FORBIDDEN)
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
@@ -59,8 +58,8 @@ class ArticleDetailView(APIView):
             return Response({"message": "삭제완료!"}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response("권한이 없습니다.", status=status.HTTP_403_FORBIDDEN)
-        
-        
+
+
 # =================== 글 리스트 목록 ===================
 
 
@@ -71,8 +70,9 @@ class ArticleListView(APIView):  # /article/list/<int:user_id>/
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class CommentView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     # ===================== 댓글 목록 보기 =========================
     def get(self, request, article_id):
@@ -102,10 +102,9 @@ class CommentView(APIView):
             )
 
 
-#------------------- 게시글 좋아요 ------------------- 
-
+# ------------------- 게시글 좋아요 -------------------
 class ArticleHeartsView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def post(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
@@ -117,23 +116,26 @@ class ArticleHeartsView(APIView):
             article.hearts.add(request.user)
             return Response({"message": "좋아요를 눌렀습니다."}, status=status.HTTP_200_OK)
 
-#------------------- 게시글 좋아요 갯수 ------------------- 
+    # ------------------- 게시글 좋아요 갯수 -------------------
     def get(self, request, article_id):
         article = Article.objects.get(id=article_id)
         heart_count = article.count_hearts()
-        return Response({'hearts': heart_count})
+        return Response({"hearts": heart_count})
 
-#--------------------- 게시글 좋아요 보기 ----------------------
+
+# --------------------- 게시글 좋아요 보기 ----------------------
 class HeartsListView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def post(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
 
         if request.user in article.hearts.all():
             article.hearts.remove(request.user)
-            return Response('좋아요 취소', status=status.HTTP_200_OK)
+            return Response("좋아요 취소", status=status.HTTP_200_OK)
         else:
             article.hearts.add(request.user)
-            return Response('좋아요', status=status.HTTP_200_OK)
+            return Response("좋아요", status=status.HTTP_200_OK)
 
     def get(self, request, user_id):
         user = User.objects.get(id=user_id)

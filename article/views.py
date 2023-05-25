@@ -15,6 +15,8 @@ from user.models import User
 
 
 class ArticleView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request):
         articles = Article.objects.all().order_by("-created_at")
         serializer = ArticleListSerializer(articles, many=True)
@@ -30,7 +32,7 @@ class ArticleView(APIView):
 
 
 class ArticleDetailView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
@@ -73,7 +75,7 @@ class ArticleListView(APIView):  # /article/list/<int:user_id>/
 
 
 class CommentView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     # ===================== 댓글 목록 보기 =========================
     def get(self, request, article_id):
@@ -107,7 +109,7 @@ class CommentView(APIView):
 
 
 class ArticleHeartsView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def post(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
@@ -128,6 +130,8 @@ class ArticleHeartsView(APIView):
 
 # --------------------- 게시글 좋아요 보기 ----------------------
 class HeartsListView(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def post(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
 

@@ -50,7 +50,7 @@ class ArticleListSerializer(serializers.ModelSerializer):
     changed_image = serializers.ImageField()
 
     def get_user(self, obj):
-        return obj.user.nickname
+        return {"nickname": obj.user.nickname, "id": obj.user.id}
 
     class Meta:
         model = Article

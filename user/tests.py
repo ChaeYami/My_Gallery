@@ -67,3 +67,12 @@ class CustomTokenObtainPairViewTest(APITestCase):
         response = self.client.post(url, login_data)
         print(response.data)
         self.assertEqual(response.status_code, 200) # 로그인 요청이 성공적으로 처리되었는지 확인
+
+    # 프로필 페이지 상세보기 테스트 코드
+    def test_profil_detail(self):
+        user_id = self.user.id # 프로필 페이지를 확인할 사용자의 user_id
+        url = reverse("profile_view", kwargs={"user_id": user_id})
+        
+        response = self.client.get(url)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)

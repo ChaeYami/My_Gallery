@@ -5,6 +5,9 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+app_name= 'user'#테스트코드
+
+
 urlpatterns = [
     path('signup/', views.SignupView.as_view(), name='sign_up_view'), # /user/signup/
     path("verify-email/b'<str:uidb64>'/<str:token>/",views.VerifyEmailView.as_view(), name='verify-email'),# /user/verify-email/b'<str:uidb64>'/<str:token>/

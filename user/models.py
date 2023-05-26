@@ -41,7 +41,7 @@ class User(AbstractBaseUser):
     point = models.IntegerField("포인트", default=500)
 
     followings = models.ManyToManyField(
-        "self", symmetrical=False, related_name="followers", null=True, blank=True
+        "self", symmetrical=False, related_name="followers", blank=True
     )
 
     is_active = models.BooleanField("활성화", default=False)  # 이메일 인증 전에는 비활성화

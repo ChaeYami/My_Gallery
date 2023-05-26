@@ -25,6 +25,7 @@ urlpatterns = [
     path(
         "comment/<int:comment_id>/", views.CommentView.as_view(), name="comment_delete"
     ),
+
     path(
         "list/<int:user_id>/", views.ArticleListView.as_view(), name="article_list"
     ),  # /article/<int:article_id>/list

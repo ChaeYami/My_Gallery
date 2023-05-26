@@ -157,6 +157,8 @@ class PasswordResetViewTest(APITestCase):
     def setUp(self):            
         self.user = User.objects.create_user(email='sdgasdf@naver.com', account='admin', nickname='admin', password='G1843514dadg23@')
         self.client.force_authenticate(user=self.user) # force_authenticate 인증된 사용자로 로그인
+        self.token = PasswordResetTokenGenerator().make_token(self.user) # token값 발급
+        self.uidb64 = urlsafe_b64encode(smart_bytes(self.user.id)).decode() # uidb64값 발급
 
     # 비밀번호 재설정 이메일 보내기 테스트 코드
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
@@ -164,5 +166,12 @@ class PasswordResetViewTest(APITestCase):
         url = reverse("user:password_reset")
         password_reset_data = {'email' : 'sdgasdf@naver.com'}
         response = self.client.post(url, password_reset_data)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
+
+    # 비밀번호 재설정 토큰 확인 테스트 코드    
+    def test_password_token_check(self):      
+        url = reverse("user:password_reset_confirm", kwargs={"token": self.token, "uidb64" : self.uidb64})
+        response = self.client.get(url)
         print(response.data)
         self.assertEqual(response.status_code, 200)

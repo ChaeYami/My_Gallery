@@ -95,19 +95,17 @@ class CustomTokenObtainPairViewTest(APITestCase):
         print(response.data)
         self.assertEqual(response.status_code, 200)
 
-    # # 회원 탈퇴 테스트 코드(수정 필요)
-    # def test_user_delete(self):
-    #     user_id = self.user.id
+    # 회원 탈퇴 테스트 코드
+    def test_user_delete(self):
+        user_id = self.user.id
+        url = reverse("user:profile_view", kwargs={"user_id": user_id})
+        delete_data = {
+            "password": "G1843514dadg23@"
+        }        
 
-    #     url = reverse("user:profile_view", kwargs={"user_id": user_id})
-    #     delete_data = {
-    #         "password": "G1843514dadg23"
-    #     }
-
-    #     response = self.client.force_authenticate(user=self.user)
-    #     response = self.client.delete(url, datas=delete_data)
-    #     print(response.data)
-    #     self.assertEqual(response.status_code, 204)
+        response = self.client.delete(url, data=delete_data)
+        print(response.data)
+        self.assertEqual(response.status_code, 204)
 
 
 class FollowViewTest(APITestCase):        

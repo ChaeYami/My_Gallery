@@ -10,7 +10,7 @@ from django.utils.encoding import force_bytes, smart_bytes
 class SignupViewTest(APITestCase):
     # 회원가입 테스트 코드
     def test_signup(self):
-        url = reverse("sign_up_view")
+        url = reverse("user:sign_up_view")
         data = {"email" : "sdgasdf@naver.com",
                 "account" : "SHGDF",
                 "nickname" : "test1",
@@ -59,7 +59,7 @@ class CustomTokenObtainPairViewTest(APITestCase):
 
     # 로그인 테스트 코드
     def test_login(self):
-        url = reverse("login_view")
+        url = reverse("user:login_view")
         login_data = {
             'account': 'admin',
             'password': 'G1843514dadg23@'
@@ -71,7 +71,7 @@ class CustomTokenObtainPairViewTest(APITestCase):
     # 프로필 페이지 상세보기 테스트 코드
     def test_profil_detail(self):
         user_id = self.user.id # 프로필 페이지를 확인할 사용자의 user_id
-        url = reverse("profile_view", kwargs={"user_id": user_id})
+        url = reverse("user:profile_view", kwargs={"user_id": user_id})
         
         response = self.client.get(url)
         print(response.data)
@@ -80,7 +80,7 @@ class CustomTokenObtainPairViewTest(APITestCase):
     # 프로필 페이지 수정 테스트 코드
     def test_profil_update(self):
         user_id = self.user.id
-        url = reverse("profile_view", kwargs={"user_id": user_id})
+        url = reverse("user:profile_view", kwargs={"user_id": user_id})
         update_data = {
             "nickname" : "nick",
             "introduce": "안녕하십니까!"
@@ -95,7 +95,7 @@ class CustomTokenObtainPairViewTest(APITestCase):
     # def test_user_delete(self):
     #     user_id = self.user.id
 
-    #     url = reverse("profile_view", kwargs={"user_id": user_id})
+    #     url = reverse("user:profile_view", kwargs={"user_id": user_id})
     #     delete_data = {
     #         "password": "G1843514dadg23"
     #     }
@@ -121,7 +121,7 @@ class FollowViewTest(APITestCase):
     # 팔로우 등록 실패(나 자신 팔로우 진행) 테스트 코드
     def test_follow_fail(self):
         user_id = self.user.id
-        url = reverse("follow_view", kwargs={"user_id": user_id})
+        url = reverse("user:follow_view", kwargs={"user_id": user_id})
         response = self.client.post(url)
         print(response.data)
         self.assertEqual(response.status_code, 403)
@@ -129,7 +129,7 @@ class FollowViewTest(APITestCase):
     # 팔로우 등록 테스트 코드
     def test_follow(self):
         user_id = 7
-        url = reverse("follow_view", kwargs={"user_id": user_id})
+        url = reverse("user:follow_view", kwargs={"user_id": user_id})
         response = self.client.post(url)
         print(response.data)
         self.assertEqual(response.status_code, 200)
@@ -137,7 +137,7 @@ class FollowViewTest(APITestCase):
     # # 팔로우 취소 테스트 코드
     # def test_follow_cancel(self):
     #     user_id = 2
-    #     url = reverse("follow_view", kwargs={"user_id": user_id})
+    #     url = reverse("user:follow_view", kwargs={"user_id": user_id})
     #     response = self.client.post(url)
     #     print(response.data)
     #     self.assertEqual(response.status_code, 200)
@@ -145,7 +145,7 @@ class FollowViewTest(APITestCase):
     # # 팔로우/팔로잉 리스트 보기 테스트 코드
     # def test_follow_list(self):
     #     user_id = 1 # 확인할 팔로우 페이지의 사용자 id
-    #     url = reverse("follow_view", kwargs={"user_id": user_id})
+    #     url = reverse("user:follow_view", kwargs={"user_id": user_id})
     #     response = self.client.get(url)
     #     print(response.data)
     #     self.assertEqual(response.status_code, 200)
@@ -159,7 +159,7 @@ class PasswordResetViewTest(APITestCase):
     # 비밀번호 재설정 이메일 보내기 테스트 코드
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_password_reset_email_send(self):
-        url = reverse("password_reset")
+        url = reverse("user:password_reset")
         password_reset_data = {'email' : 'sdgasdf@naver.com'}
         response = self.client.post(url, password_reset_data)
         print(response.data)

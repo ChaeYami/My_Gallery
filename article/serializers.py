@@ -27,7 +27,9 @@ class ArticleSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     uploaded_image = serializers.ImageField()
     changed_image = serializers.ImageField()
-
+    created_at = serializers.DateTimeField(
+        format="%Y-%m-%d %H:%M", read_only=True
+    )
     # id = serializers.IntegerField()  # 'id' 필드 추가(테스트 코드)
     def get_user(self, obj):
         return obj.user.id

@@ -29,6 +29,10 @@ class VerifyEmailViewTest(APITestCase):
                                              nickname='admin',
                                              password='G1843514dadg23@')
 
+    # 생성한 유저 활성화 확인 테스트 코드    
+    def test_create_user_is_active(self):
+        self.assertFalse(self.user.is_active)
+
     # 이메일 인증 테스트 코드
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend") # 이메일을 실제로 전송하지 않고 로컬 메모리에 저장하는 백엔드
     def test_email_verification(self):

@@ -19,12 +19,12 @@ class TransformView(APIView):
 
     # .t7 파일 로드
     model_dict = {
-        '1': cv2.dnn.readNetFromTorch('change/models/candy.t7'),
+        '1': cv2.dnn.readNetFromTorch('change/models/starry_night.t7'),
         '2': cv2.dnn.readNetFromTorch('change/models/composition_vii.t7'),
         '3': cv2.dnn.readNetFromTorch('change/models/feathers.t7'),
         '4': cv2.dnn.readNetFromTorch('change/models/la_muse.t7'),
         '5': cv2.dnn.readNetFromTorch('change/models/mosaic.t7'),
-        '6': cv2.dnn.readNetFromTorch('change/models/starry_night.t7'),
+        '6': cv2.dnn.readNetFromTorch('change/models/candy.t7'),
         '7': cv2.dnn.readNetFromTorch('change/models/the_scream.t7'),
         '8': cv2.dnn.readNetFromTorch('change/models/the_wave.t7'),
         '9': cv2.dnn.readNetFromTorch('change/models/udnie.t7'),

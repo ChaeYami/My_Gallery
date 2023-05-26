@@ -3,7 +3,8 @@ from user.models import User
 import os
 from uuid import uuid4
 from datetime import date
-from django.urls import reverse #테스트 코드
+from django.urls import reverse  # 테스트 코드
+
 
 # 이미지 파일 이름 uuid형식으로 바꾸기
 def rename_imagefile_to_uuid(instance, filename):
@@ -29,15 +30,15 @@ class Article(models.Model):
     hearts = models.ManyToManyField(User, blank=True, related_name="hearts")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성시간")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="수정시간")
+    change_id = models.PositiveSmallIntegerField(default=1, verbose_name="모델id")
 
     # ---------------- 좋아요 갯수 ----------------
     def count_hearts(self):
         return self.hearts.count()
 
-    #---------------- 테스트 코드 함수 --------------
+    # ---------------- 테스트 코드 함수 --------------
     def get_absolute_url(self):
-        return reverse('articles:article_detail_view', kwargs={"article_id": self.pk})
-
+        return reverse("articles:article_detail_view", kwargs={"article_id": self.pk})
 
     # 이미지
     uploaded_image = models.ImageField(
@@ -50,7 +51,7 @@ class Article(models.Model):
     def __str__(self):
         return str(self.title)
 
-    
+
 # 댓글 models
 class Comment(models.Model):
     class Meta:

@@ -1,6 +1,10 @@
 from django.urls import path
 from article import views
 
+app_name= 'articles'# 테스트 코드
+
+
+
 
 urlpatterns = [
     path("", views.ArticleView.as_view(), name="article_view"),

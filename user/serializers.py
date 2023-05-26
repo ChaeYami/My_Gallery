@@ -157,6 +157,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["account"] = user.account
         token["nickname"] = user.nickname
         token["point"] = user.point
+        token["profile_img"] =str(user.profile_img)
         return token
     
     def get_user(self, validated_data):

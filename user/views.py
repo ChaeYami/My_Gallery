@@ -139,7 +139,7 @@ class ProfileView(APIView):
     # 회원 탈퇴 (비밀번호 받아서)
     def delete(self, request, user_id):
         user = self.get_object(user_id)
-        datas = request.data
+        datas = request.data.copy()
         datas["is_active"] = False
         serializer = UserDelSerializer(user, data=datas)
         if user.check_password(request.data.get("password")):

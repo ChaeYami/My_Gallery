@@ -175,3 +175,16 @@ class PasswordResetViewTest(APITestCase):
         response = self.client.get(url)
         print(response.data)
         self.assertEqual(response.status_code, 200)
+
+    # 비밀번호 재설정 테스트 코드
+    def test_set_new_password(self):
+        url = reverse("user:password_reset_confirm")
+        new_password_data = {
+                "password": "qEadg423$#hbnad",
+                "repassword": "qEadg423$#hbnad",
+                "token": self.token,
+                "uidb64": self.uidb64
+        }
+        response = self.client.put(url, new_password_data)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)

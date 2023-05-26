@@ -30,6 +30,7 @@ class Article(models.Model):
     hearts = models.ManyToManyField(User, blank=True, related_name="hearts")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성시간")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="수정시간")
+    change_id = models.PositiveSmallIntegerField(default=1, verbose_name="모델id")
 
     # ---------------- 좋아요 갯수 ----------------
     def count_hearts(self):

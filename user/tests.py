@@ -205,3 +205,15 @@ class ActivateAccountViewTest(APITestCase):
         response = self.client.post(url, reactivate_data)
         print(response.data)
         self.assertEqual(response.status_code, 200)
+
+    # 계정 재활성화 이메일 인증 테스트 코드
+    def test_reactivate_account(self):
+        uid = urlsafe_b64encode(force_bytes(self.user.pk))
+        token = PasswordResetTokenGenerator().make_token(self.user)
+        authurl_link = f"http://localhost:8000/user/verify-email/{uid}/{token}/"
+        
+        response = self.client.get(authurl_link)
+        self.assertEqual(response.status_code, 302)
+
+        self.user.refresh_from_db() # 데이터 베이스 업데이트
+        self.assertTrue(self.user.is_active) # 계정 활성화 True 확인

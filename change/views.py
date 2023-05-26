@@ -29,9 +29,9 @@ class TransformView(APIView):
         '9': cv2.dnn.readNetFromTorch('change/models/udnie.t7'),
     }
     
-    def post(self, request, change_id, format=None):
+    def post(self, request, format=None):
         file_obj = request.FILES['image']
-        # change_id = request.POST['change_id']
+        change_id = request.POST['change_id']
         
         net = self.model_dict.get(str(change_id))
         if net is None:

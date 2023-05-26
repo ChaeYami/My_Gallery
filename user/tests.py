@@ -130,27 +130,27 @@ class FollowViewTest(APITestCase):
 
     # 팔로우 등록 테스트 코드
     def test_follow(self):
-        user_id = 7
+        user_id = self.user_3.id
         url = reverse("user:follow_view", kwargs={"user_id": user_id})
         response = self.client.post(url)
         print(response.data)
         self.assertEqual(response.status_code, 200)
 
-    # # 팔로우 취소 테스트 코드
-    # def test_follow_cancel(self):
-    #     user_id = 2
-    #     url = reverse("user:follow_view", kwargs={"user_id": user_id})
-    #     response = self.client.post(url)
-    #     print(response.data)
-    #     self.assertEqual(response.status_code, 200)
+    # 팔로우 취소 테스트 코드
+    def test_follow_cancel(self):
+        user_id = self.user_2.id
+        url = reverse("user:follow_view", kwargs={"user_id": user_id})
+        response = self.client.post(url)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
 
-    # # 팔로우/팔로잉 리스트 보기 테스트 코드
-    # def test_follow_list(self):
-    #     user_id = 1 # 확인할 팔로우 페이지의 사용자 id
-    #     url = reverse("user:follow_view", kwargs={"user_id": user_id})
-    #     response = self.client.get(url)
-    #     print(response.data)
-    #     self.assertEqual(response.status_code, 200)
+    # 팔로우/팔로잉 리스트 보기 테스트 코드
+    def test_follow_list(self):
+        user_id = self.user.id # 확인할 팔로우 페이지의 사용자 id
+        url = reverse("user:follow_view", kwargs={"user_id": user_id})
+        response = self.client.get(url)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
 
 
 class PasswordResetViewTest(APITestCase):

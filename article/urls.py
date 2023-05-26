@@ -17,4 +17,6 @@ urlpatterns = [
     path(
         "comment/<int:comment_id>/", views.CommentView.as_view(), name="comment_delete"
     ),
+    # 좋아요 url 추가
+    path("<int:article_id>/hearts/", views.ArticleHeartsView.as_view(), name="hearts_view"),
 ]

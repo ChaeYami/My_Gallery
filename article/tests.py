@@ -94,6 +94,8 @@ class CustomTokenObtainPairViewTest(APITestCase):
         image_file.seek(0)
 
         self.article_data["uploaded_image"]= image_file
+        self.article_data["changed_image"]= image_file
+
         print(self.article_data)
         response = self.client.post(
             path=reverse("articles:article_view"),
@@ -211,7 +213,8 @@ class ArticleDetailViewTest(APITestCase):
         self.article_data = {
             "title": "updated test Title",
             "content": "updated test content",
-            "uploaded_image": SimpleUploadedFile('image.png', image_file.read(), content_type='image/png')
+            "uploaded_image": SimpleUploadedFile('image.png', image_file.read(), content_type='image/png'),
+            "changed_image": SimpleUploadedFile('image.png', image_file.read(), content_type='image/png'),
         }
 
         response = self.client.put(
@@ -261,7 +264,7 @@ class CommentViewTest(APITestCase):
 
 
 
-    #------------------------ Comment 작성 ------------------------
+#     #------------------------ Comment 작성 ------------------------
     
     
     def test_create_article_success(self):
@@ -331,7 +334,7 @@ class CommentDetailViewTest(APITestCase):
 
     
    
-        # 코멘트 삭제
+    #------------------------- 코멘트 삭제 -------------------------
     def test_comment_delete(self):
         comment_id = self.comment[0].id  # 삭제할 댓글의 ID
         response = self.client.delete(
@@ -345,4 +348,52 @@ class CommentDetailViewTest(APITestCase):
 
 
 
+# -------------------------------- 좋아요 test --------------------------------
 
+class HerartViewTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.email = 'ark375@naver.com'
+        cls.nickname = 'admin'
+        cls.account = 'admin'
+        cls.password = 'G1843514dadg23!4'
+        cls.user_data = {'account':'admin','email':'ark375@naver.com','password':'G1843514dadg23!4'}
+        cls.article_data = {"title": "test Title", "content": "test content"}
+        cls.user = User.objects.create_user(account=cls.account, email=cls.email, nickname=cls.nickname, password=cls.password)
+        cls.article = Article.objects.create(**cls.article_data, user=cls.user)
+        cls.article_2 = Article.objects.create(**cls.article_data, user=cls.user)
+        cls.user.hearts.add(cls.article_2)
+        
+
+    def setUp(self):
+        # self.access_token = self.client.post(reverse("user:login_view"), self.user_data).data["access"]
+        self.client.force_authenticate(user=self.user)
+    
+    
+    
+    # ----------------------------- 좋아요 누르기 -----------------------------
+    def test_hearts_article(self):
+        url = reverse("articles:hearts_view", kwargs={"article_id": self.article.id})
+
+        response = self.client.post(url)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': '좋아요를 눌렀습니다.'})
+
+    #----------------------------- 좋아요 취소하기 -----------------------------
+    def test_hearts_article_cancle(self):
+        url = reverse("articles:hearts_view", kwargs={"article_id": self.article_2.id})
+
+        response = self.client.post(url)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': '좋아요를 취소했습니다.'})
+
+    #------------------------------ 좋아요 count ------------------------------
+
+    def test_get_hearts_count(self):
+        url = reverse("articles:hearts_view", kwargs={"article_id": self.article_2.id})
+
+        response = self.client.get(url)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

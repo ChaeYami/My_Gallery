@@ -188,3 +188,20 @@ class PasswordResetViewTest(APITestCase):
         response = self.client.put(url, new_password_data)
         print(response.data)
         self.assertEqual(response.status_code, 200)
+
+    
+class ActivateAccountViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email='sdgasdf@naver.com', account='admin', nickname='admin', password='G1843514dadg23@')
+        self.user.is_active = False # 계정 비활성화일 경우에 진행을 위해 정보 추가
+        self.user.save()
+
+    # 계정 재활성화 이메일 전송 확인 테스트 코드
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_reactivate_account_email_send(self):           
+        url = reverse("user:reactivation")
+        reactivate_data = {'email':'sdgasdf@naver.com'}
+
+        response = self.client.post(url, reactivate_data)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)

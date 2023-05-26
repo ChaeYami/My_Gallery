@@ -27,7 +27,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     uploaded_image = serializers.ImageField()
     changed_image = serializers.ImageField()
-
+    # id = serializers.IntegerField()  # 'id' 필드 추가(테스트 코드)
     def get_user(self, obj):
         return obj.user.nickname
 
@@ -35,14 +35,15 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = "__all__"
 
-
+#테스트 코드 에러 주석 처리
 class ArticleCreateSerializer(serializers.ModelSerializer):
     uploaded_image = serializers.ImageField()
-    changed_image = serializers.ImageField()
+    # changed_image = serializers.ImageField()
 
     class Meta:
         model = Article
-        fields = ["title", "content", "uploaded_image", "changed_image"]
+        # fields = ["title", "content", "uploaded_image", "changed_image"]
+        fields = ["title", "content", "uploaded_image"]
 
 
 class ArticleListSerializer(serializers.ModelSerializer):
@@ -50,8 +51,8 @@ class ArticleListSerializer(serializers.ModelSerializer):
     changed_image = serializers.ImageField()
 
     def get_user(self, obj):
-        return obj.user.nickname
+        return {"nickname": obj.user.nickname, "id": obj.user.id}
 
     class Meta:
         model = Article
-        fields = ["id", "title", "user", "changed_image"]
+        fields = ["id", "title", "user", "changed_image", "hearts"]

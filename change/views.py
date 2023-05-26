@@ -11,6 +11,7 @@ from .models import ImageTransform
 import cv2
 import numpy as np
 import os
+import base64
 
 class TransformView(APIView):
     parser_classes = [parsers.MultiPartParser]
@@ -29,9 +30,9 @@ class TransformView(APIView):
         '9': cv2.dnn.readNetFromTorch('change/models/udnie.t7'),
     }
     
-    def post(self, request, change_id, format=None):
+    def post(self, request, format=None):
         file_obj = request.FILES['image']
-        # change_id = request.POST['change_id']
+        change_id = request.POST['change_id']
         
         net = self.model_dict.get(str(change_id))
         if net is None:
@@ -60,11 +61,11 @@ class TransformView(APIView):
 
         # 임시 파일을 Django model에 저장
         with open('temp.png', 'rb') as f:
-            img_transformed = ImageTransform(image=File(f))
-            img_transformed.save()
+            image_data = f.read()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
         
         # 임시 파일 삭제
         os.remove('temp.png')
 
-        # 변환된 이미지의 URL을 응답으로 보내기
-        return Response({'image_url': img_transformed.image.url},status=status.HTTP_200_OK)
+        # 변환된 이미지 데이터를 응답으로 보내기
+        return Response({'image_data': image_base64}, status=status.HTTP_200_OK)

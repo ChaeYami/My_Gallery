@@ -23,9 +23,20 @@ from django.conf import settings
 
 class UserSerializer(serializers.ModelSerializer):
     joined_at = serializers.SerializerMethodField()
-    
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    followings = serializers.StringRelatedField(many=True, required=False)
+    followers = serializers.StringRelatedField(many=True, required=False)
+
     def get_joined_at(self, obj):
-        return obj.joined_at.strftime("%Y년 %m월 %d일 %p %I:%M")
+        return obj.joined_at.strftime("%Y년 %m월 %d일")
+
+    def get_followers_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.followings.count()
+
     class Meta:
         model = User
         fields = "__all__"
@@ -146,7 +157,13 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["account"] = user.account
         token["nickname"] = user.nickname
+        token["point"] = user.point
+        token["profile_img"] = str(user.profile_img)
         return token
+
+    def get_user(self, validated_data):
+        user = self.user
+        return user
 
 
 # ===========================================================
@@ -189,9 +206,7 @@ class PasswordResetSerializer(serializers.Serializer):
             token = PasswordResetTokenGenerator().make_token(user)
 
             frontend_site = "127.0.0.1:5500"
-            absurl = (
-                f"http://{frontend_site}/set_password.html?id=${uidb64}&token=${token}"
-            )
+            absurl = f"http://{frontend_site}/user/set_password.html?id=${uidb64}&token=${token}"
 
             email_body = "비밀번호 재설정 \n " + absurl
             message = {
@@ -301,10 +316,10 @@ class PasswordVerificationSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128)
 
 
-# 팔로우/팔로워 
+# 팔로우/팔로워
 class FollowSerializer(serializers.ModelSerializer):
-    followings = serializers.StringRelatedField(many = True)
-    followers = serializers.StringRelatedField(many = True)
+    followings = serializers.StringRelatedField(many=True)
+    followers = serializers.StringRelatedField(many=True)
 
     def get_user(self, obj):
         return obj.user.account

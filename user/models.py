@@ -16,7 +16,6 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-
         user = self.create_user(email=email, password=password, **extra_fields)
 
         user.is_admin = True
@@ -37,12 +36,12 @@ class User(AbstractBaseUser):
         "프로필사진",
         blank=True,
     )
-    introduce = models.TextField("소개", default=None ,blank=True, null=True)
+    introduce = models.TextField("소개", default=None, blank=True, null=True)
     joined_at = models.DateTimeField(auto_now=True)
-
+    point = models.IntegerField("포인트", default=500)
 
     followings = models.ManyToManyField(
-        "self", symmetrical=False, related_name="followers", blank=True
+        "self", symmetrical=False, related_name="followers", null=True, blank=True
     )
 
     is_active = models.BooleanField("활성화", default=False)  # 이메일 인증 전에는 비활성화

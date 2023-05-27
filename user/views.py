@@ -138,15 +138,14 @@ class ProfileView(APIView):
     # 회원 탈퇴 (비밀번호 받아서)
     def delete(self, request, user_id):
         user = self.get_object(user_id)
-        datas = request.data
+        datas = request.data.copy() # request.data → request.data.copy() 변경
+        # request.data는 Django의 QueryDict 객체로서 변경이 불가능하여 복사하여 수정한 후 전달하는 방법을 이용!
         datas["is_active"] = False
         serializer = UserDelSerializer(user, data=datas)
         if user.check_password(request.data.get("password")):
             if serializer.is_valid():
                 serializer.save()
-                return Response(
-                    {"message": "계정 비활성화 완료"}, status=status.HTTP_204_NO_CONTENT
-                )
+                return Response({"message": "계정 비활성화 완료"}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(
                 {"message": f"패스워드가 다릅니다"}, status=status.HTTP_400_BAD_REQUEST

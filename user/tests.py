@@ -142,7 +142,7 @@ class FollowViewTest(APITestCase):
         url = reverse("user:follow_view", kwargs={"user_id": user_id})
         response = self.client.post(url)
         print(response.data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 205)
 
     # 팔로우/팔로잉 리스트 보기 테스트 코드
     def test_follow_list(self):

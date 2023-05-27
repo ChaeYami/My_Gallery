@@ -143,7 +143,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = super().update(instance, validated_data)
-       
+
         user.save()
         return user
 
@@ -317,11 +317,35 @@ class PasswordVerificationSerializer(serializers.Serializer):
 
 # 팔로우/팔로워
 class FollowSerializer(serializers.ModelSerializer):
-    followings = serializers.StringRelatedField(many=True)
-    followers = serializers.StringRelatedField(many=True)
+    followings = serializers.SerializerMethodField()
+    followers = serializers.SerializerMethodField()
 
-    def get_user(self, obj):
-        return obj.user.account
+    def get_followings(self, obj):
+        followings = obj.followings.all()
+        return [
+            {
+                "nickname": following.nickname,
+                "id": following.id,
+                "profile_image": self.get_profile_image_url(following.profile_img),
+            }
+            for following in followings
+        ]
+
+    def get_followers(self, obj):
+        followers = obj.followers.all()
+        return [
+            {
+                "nickname": follower.nickname,
+                "id": follower.id,
+                "profile_image": self.get_profile_image_url(follower.profile_img),
+            }
+            for follower in followers
+        ]
+
+    def get_profile_image_url(self, profile_img):
+        if profile_img:
+            return f"{settings.MEDIA_URL}{profile_img}"
+        return None
 
     class Meta:
         model = User

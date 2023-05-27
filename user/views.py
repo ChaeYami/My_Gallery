@@ -111,7 +111,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 # ================================ 프로필 페이지 시작 ================================
 class ProfileView(APIView):
-
     def get_object(self, user_id):
         return get_object_or_404(User, id=user_id)
 
@@ -139,13 +138,15 @@ class ProfileView(APIView):
     # 회원 탈퇴 (비밀번호 받아서)
     def delete(self, request, user_id):
         user = self.get_object(user_id)
-        datas = request.data.copy()
+        datas = request.data
         datas["is_active"] = False
         serializer = UserDelSerializer(user, data=datas)
         if user.check_password(request.data.get("password")):
             if serializer.is_valid():
                 serializer.save()
-                return Response({"message": "계정 비활성화 완료"}, status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    {"message": "계정 비활성화 완료"}, status=status.HTTP_204_NO_CONTENT
+                )
         else:
             return Response(
                 {"message": f"패스워드가 다릅니다"}, status=status.HTTP_400_BAD_REQUEST
@@ -240,6 +241,7 @@ class FollowView(APIView):
 
 
 # ================================= 팔로우 끝 =================================
+
 
 # 계정 재활성화
 class ActivateAccountView(APIView):

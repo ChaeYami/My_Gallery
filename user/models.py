@@ -34,11 +34,7 @@ class User(AbstractBaseUser):
     account = models.CharField("아이디", max_length=20, unique=True)
     email = models.EmailField("이메일", max_length=255, unique=True)
     nickname = models.CharField("닉네임", max_length=15)
-    profile_img = models.ImageField(
-        "프로필사진",
-        blank=True,
-        default=os.path.join(settings.BASE_DIR, "static/images/unknown.jpg"),
-    )
+    profile_img = models.ImageField("프로필사진", blank=True, upload_to="profile_img/")
     introduce = models.TextField("소개", default=None, blank=True, null=True)
     joined_at = models.DateTimeField(auto_now=True)
     point = models.IntegerField("포인트", default=500)

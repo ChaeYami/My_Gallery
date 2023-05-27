@@ -32,7 +32,8 @@ class ArticleSerializer(serializers.ModelSerializer):
     )
     # id = serializers.IntegerField()  # 'id' 필드 추가(테스트 코드)
     def get_user(self, obj):
-        return obj.user.id
+        return {"nickname": obj.user.nickname, "id": obj.user.id} # 닉네임 사용해야 함
+        # return obj.user.id
     class Meta:
         model = Article
         fields = "__all__"

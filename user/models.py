@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.exceptions import ValidationError
+import os
+from MyGallery import settings
 
 
 class UserManager(BaseUserManager):

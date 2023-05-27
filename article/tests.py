@@ -13,6 +13,8 @@ from .serializers import ArticleSerializer
 
 
 # ----------------------------- 임시 이미지 파일 -----------------------------
+
+
 def get_temporary_image(temp_file):
     size = (200, 200)
     color = (255, 0, 0, 0)
@@ -20,6 +22,8 @@ def get_temporary_image(temp_file):
     image.save(temp_file, "png")
     return temp_file
 
+
+#--------------------------- 유저 생성 -------------------------------------
 
 
 class CustomTokenObtainPairViewTest(APITestCase):
@@ -42,6 +46,8 @@ class CustomTokenObtainPairViewTest(APITestCase):
 
 
     #---------------------- 로그인 테스트 코드 ----------------------
+    
+    
     def test_login(self):
         url = reverse("user:login_view")
         data = {
@@ -57,31 +63,19 @@ class CustomTokenObtainPairViewTest(APITestCase):
 
 
     # ------------------- 로그인 안 되어 있을 때 -------------------
+    
+    
     def test_fail_if_not_logged_in(self):
         url = reverse("articles:article_view")
         response = self.client.post(url, self.article_data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
     
    
 
-
+    #-------------------- 게시글 생성  ---------------------------
     
-    #-------------------- 게시글 생성 --------------------
-    # def test_create_article(self):
-    #     response = self.client.post(
-    #         path=reverse("articles:article_view"),
-    #         data=self.article_data,
-    #         HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
-    #     )
-    #     print(response.data)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(Article.objects.count(), 1)
-    #     self.assertEqual(Article.objects.get().title,"test title")
-
-
-
-
-    #-------------------- 임시 이미지 파일 게시글 생성  ---------------------------
+    
     def test_create_article_image(self):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
@@ -91,12 +85,11 @@ class CustomTokenObtainPairViewTest(APITestCase):
         temp_file2 = tempfile.NamedTemporaryFile()
         temp_file2.name = "image2.png"
         image_file2 = get_temporary_image(temp_file2)
-        image_file.seek(0)
+        image_file2.seek(0)
 
-        self.article_data["uploaded_image"]= image_file
-        self.article_data["changed_image"]= image_file
+        self.article_data["uploaded_image"] = image_file
+        self.article_data["changed_image"] = image_file2
 
-        print(self.article_data)
         response = self.client.post(
             path=reverse("articles:article_view"),
             data=encode_multipart(data=self.article_data, boundary=BOUNDARY),
@@ -104,25 +97,31 @@ class CustomTokenObtainPairViewTest(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}"
         )
         print(response.data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  
-        self.assertEqual(Article.objects.count(), 2)  # 게시글이 추가되었는지 확인
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Article.objects.count(), 2)
         self.assertEqual(Article.objects.last().title, "test title")
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
     
-    
+
+
 
 
     #-------------- 게시글 보기(아무것도 없을 경우) ------------------
+    
+    
     def test_get_article_list_empty(self):
-        response = self.client.get(path=reverse("articles:article_view"))
+        response = self.client.get(path=reverse("articles:article_list", kwargs={"user_id": self.user.id}))
+        print(response)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-    
-    
 
 
+
+
+
+    #-------------- 게시글 보기(모두 보기 게시글) ------------------
     
-    #-------------- 게시글 보기(모두 보기 게시글 ) ------------------
+    
     def test_article_list(self):
         self.article = []
         for _ in range(3):
@@ -130,36 +129,12 @@ class CustomTokenObtainPairViewTest(APITestCase):
                 Article.objects.create(**self.article_data, user=self.user)
             )
         response = self.client.get(
-            path=reverse("articles:article_view"),
+            path=reverse("articles:article_list", kwargs={"user_id": self.user.id}),
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
         )
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 4)
-
-
-
-
-
-
-#------------------------- 가짜 데이터 -------------------------
-# class ArticleReadAPIViewTestCase(APITestCase):
-#     @classmethod
-#     def setUpTestData(cls):
-#         cls.faker = Faker()
-#         cls.articles = []
-#         for i in range(10):
-#             cls.user = User.objects.create_user(cls.faker.name(), cls.faker.word())
-#             cls.articles.append(Article.objects.create(title=cls.faker.text(max_nb_chars=20), content=cls.faker.text(), user=cls.user))
-#             # faker를 이용해서 랜덤으로 생성
-
-#     def test_get_article(self):
-#         for article in self.articles:
-#             url = article.get_absolute_url()
-#             response = self.client.get(url)
-#             serializer = ArticleSerializer(article).data 
-#             for key, value in serializer.items():
-#                 self.assertEqual(response.data[key], value)
-
 
 
 
@@ -188,13 +163,17 @@ class ArticleDetailViewTest(APITestCase):
             )
 
     def setUp(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user) # 토큰없이 로그인
     #     self.access_token = self.client.post(reverse('user:login_view'), self.user_data).data['access']
 
     
         
 
+    
+    
     #--------------------------- 게시글 상세보기 ---------------------------
+    
+    
     def test_article_detail(self):
         response = self.client.get(
             path=reverse("articles:article_detail_view", kwargs={"article_id": 5}),
@@ -203,7 +182,12 @@ class ArticleDetailViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["content"], "test content5")
 
+    
+    
     #-------------------------- 게시글 수정하기 --------------------------
+   
+   
+   
     def test_article_detail_update(self):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
@@ -213,10 +197,14 @@ class ArticleDetailViewTest(APITestCase):
         self.article_data = {
             "title": "updated test Title",
             "content": "updated test content",
-            "uploaded_image": SimpleUploadedFile('image.png', image_file.read(), content_type='image/png'),
-            "changed_image": SimpleUploadedFile('image.png', image_file.read(), content_type='image/png'),
         }
-
+        # 이미지 파일 추가
+        image_data = image_file.read()
+        uploaded_image = SimpleUploadedFile("image.png", image_data, content_type="image/png")
+        changed_image = SimpleUploadedFile("image.png", image_data, content_type="image/png")
+        self.article_data["uploaded_image"] = uploaded_image
+        self.article_data["changed_image"] = changed_image
+       
         response = self.client.put(
             path=reverse("articles:article_detail_view", kwargs={"article_id": 5}),
             data=self.article_data,
@@ -230,6 +218,8 @@ class ArticleDetailViewTest(APITestCase):
 
 
     #------------------ 게시글 삭제하기 ------------------
+    
+    
     def test_article_detail_delete(self):
         response = self.client.delete(
             path=reverse("articles:article_detail_view", kwargs={"article_id": 5}),
@@ -264,7 +254,7 @@ class CommentViewTest(APITestCase):
 
 
 
-#     #------------------------ Comment 작성 ------------------------
+    #------------------------ Comment 작성 ------------------------
     
     
     def test_create_article_success(self):
@@ -279,6 +269,7 @@ class CommentViewTest(APITestCase):
         self.assertEqual(Comment.objects.get().comment, self.comment_data["comment"])
 
 
+    
     #------------------------- Comment리스트 -----------------------
     
     def test_comment_list(self):
@@ -299,7 +290,11 @@ class CommentViewTest(APITestCase):
         self.assertEqual(response.data[0]["comment"], "comment")
 
 
+
+
 #--------------------- Comment, 삭제 ---------------------
+
+
 class CommentDetailViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -335,6 +330,8 @@ class CommentDetailViewTest(APITestCase):
     
    
     #------------------------- 코멘트 삭제 -------------------------
+    
+    
     def test_comment_delete(self):
         comment_id = self.comment[0].id  # 삭제할 댓글의 ID
         response = self.client.delete(
@@ -373,27 +370,53 @@ class HerartViewTest(APITestCase):
     
     # ----------------------------- 좋아요 누르기 -----------------------------
     def test_hearts_article(self):
-        url = reverse("articles:hearts_view", kwargs={"article_id": self.article.id})
+        url = reverse("articles:Hearts_view", kwargs={"article_id": self.article.id})
 
         response = self.client.post(url)
         print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'message': '좋아요를 눌렀습니다.'})
 
+    
+    
     #----------------------------- 좋아요 취소하기 -----------------------------
     def test_hearts_article_cancle(self):
-        url = reverse("articles:hearts_view", kwargs={"article_id": self.article_2.id})
+        url = reverse("articles:Hearts_view", kwargs={"article_id": self.article_2.id})
 
         response = self.client.post(url)
         print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'message': '좋아요를 취소했습니다.'})
 
+    
+    
     #------------------------------ 좋아요 count ------------------------------
 
     def test_get_hearts_count(self):
-        url = reverse("articles:hearts_view", kwargs={"article_id": self.article_2.id})
+        url = reverse("articles:Hearts_view", kwargs={"article_id": self.article_2.id})
 
         response = self.client.get(url)
         print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    
+    
+    #------------------------------ 게시글 좋아요 보기 ------------------------------
+
+    def test_get_hearts_article(self):
+        user_id = self.user.id
+        url = reverse("articles:User_Hearts_View", kwargs={"user_id": self.user.id})
+
+        # 좋아요한 게시글 조회 테스트
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        articles = response.data
+        self.assertEqual(len(articles), 1)
+        self.assertEqual(articles[0]['id'], self.article_2.id)
+        self.assertEqual(articles[0]['title'], self.article_2.title)
+        self.assertEqual(articles[0]['content'], self.article_2.content)
+
+
+
+ # ======================================= 테스트 코드 끝 =======================================

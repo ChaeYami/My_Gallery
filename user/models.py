@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.exceptions import ValidationError
+import os
+from MyGallery import settings
 
 
 class UserManager(BaseUserManager):
@@ -35,6 +37,7 @@ class User(AbstractBaseUser):
     profile_img = models.ImageField(
         "프로필사진",
         blank=True,
+        default=os.path.join(settings.BASE_DIR, "static/images/unknown.jpg"),
     )
     introduce = models.TextField("소개", default=None, blank=True, null=True)
     joined_at = models.DateTimeField(auto_now=True)

@@ -318,11 +318,28 @@ class PasswordVerificationSerializer(serializers.Serializer):
 
 # 팔로우/팔로워
 class FollowSerializer(serializers.ModelSerializer):
-    followings = serializers.StringRelatedField(many=True)
-    followers = serializers.StringRelatedField(many=True)
+    followings = serializers.SerializerMethodField()
+    followers = serializers.SerializerMethodField()
 
-    def get_user(self, obj):
-        return obj.user.account
+    def get_followings(self, obj):
+        return [
+            {
+                "nickname": following.nickname,
+                "id": following.id,
+                "profile_image": following.profile_img,
+            }
+            for following in obj.followings.all()
+        ]
+
+    def get_followers(self, obj):
+        return [
+            {
+                "nickname": follower.nickname,
+                "id": follower.id,
+                "profile_image": follower.profile_img,
+            }
+            for follower in obj.followers.all()
+        ]
 
     class Meta:
         model = User

@@ -143,8 +143,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = super().update(instance, validated_data)
-        password = user.password
-        user.set_password(password)
+       
         user.save()
         return user
 

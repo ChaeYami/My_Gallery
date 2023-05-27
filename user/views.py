@@ -226,7 +226,7 @@ class FollowView(APIView):
         if you != me:
             if me in you.followers.all():
                 you.followers.remove(me)
-                return Response("unfollow", status=status.HTTP_200_OK)
+                return Response("unfollow", status=status.HTTP_205_RESET_CONTENT)
             else:
                 you.followers.add(me)
                 return Response("follow", status=status.HTTP_200_OK)

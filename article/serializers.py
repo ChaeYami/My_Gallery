@@ -9,7 +9,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     def get_user(self, obj):
-        return {"nickname": obj.user.nickname, "pk": obj.user.pk}
+        return {"nickname": obj.user.nickname, "pk": obj.user.pk,"profile_img": str(obj.user.profile_img)}
 
     class Meta:
         model = Comment
@@ -32,7 +32,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     )
     # id = serializers.IntegerField()  # 'id' 필드 추가(테스트 코드)
     def get_user(self, obj):
-        return {"nickname": obj.user.nickname, "id": obj.user.id} # 닉네임 사용해야 함
+        return {"nickname": obj.user.nickname, "pk": obj.user.pk,"profile_img": str(obj.user.profile_img)} # 닉네임 사용해야 함
         # return obj.user.id
     class Meta:
         model = Article
@@ -55,7 +55,7 @@ class ArticleListSerializer(serializers.ModelSerializer):
     changed_image = serializers.ImageField()
 
     def get_user(self, obj):
-        return {"nickname": obj.user.nickname, "id": obj.user.id}
+        return {"nickname": obj.user.nickname, "id": obj.user.id, "profile_img": str(obj.user.profile_img)}
 
     class Meta:
         model = Article

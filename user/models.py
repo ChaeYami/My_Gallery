@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.exceptions import ValidationError
+import os
+from MyGallery import settings
 
 
 class UserManager(BaseUserManager):
@@ -32,16 +34,13 @@ class User(AbstractBaseUser):
     account = models.CharField("아이디", max_length=20, unique=True)
     email = models.EmailField("이메일", max_length=255, unique=True)
     nickname = models.CharField("닉네임", max_length=15)
-    profile_img = models.ImageField(
-        "프로필사진",
-        blank=True,
-    )
+    profile_img = models.ImageField("프로필사진", blank=True, upload_to="profile_img/")
     introduce = models.TextField("소개", default=None, blank=True, null=True)
     joined_at = models.DateTimeField(auto_now=True)
     point = models.IntegerField("포인트", default=500)
 
     followings = models.ManyToManyField(
-        "self", symmetrical=False, related_name="followers", null=True, blank=True
+        "self", symmetrical=False, related_name="followers", blank=True
     )
 
     is_active = models.BooleanField("활성화", default=False)  # 이메일 인증 전에는 비활성화

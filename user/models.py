@@ -36,7 +36,7 @@ class User(AbstractBaseUser):
     nickname = models.CharField("닉네임", max_length=15)
     profile_img = models.ImageField("프로필사진", blank=True, upload_to="profile_img/")
     introduce = models.TextField("소개", default=None, blank=True, null=True)
-    joined_at = models.DateTimeField(auto_now=True)
+    joined_at = models.DateTimeField(auto_now_add=True)
     point = models.IntegerField("포인트", default=500)
 
     followings = models.ManyToManyField(

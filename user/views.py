@@ -72,9 +72,7 @@ class SignupView(APIView):
 
             return Response({"message": "가입완료!"}, status=status.HTTP_201_CREATED)
         else:
-            return Response(
-                {"message": f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # 이메일 인증
@@ -94,7 +92,7 @@ class VerifyEmailView(APIView):
             user.is_active = True
             user.save()
             # return Response({"message": "이메일 인증이 완료되었습니다."}, status=status.HTTP_200_OK)
-            return redirect("http://127.0.0.1:5500/user/login.html")
+            return redirect("http://127.0.0.1:5500/user/login.html?alert=1")
         else:
             return Response(
                 {"message": "잘못된 링크입니다."}, status=status.HTTP_400_BAD_REQUEST
@@ -138,14 +136,16 @@ class ProfileView(APIView):
     # 회원 탈퇴 (비밀번호 받아서)
     def delete(self, request, user_id):
         user = self.get_object(user_id)
-        datas = request.data.copy() # request.data → request.data.copy() 변경
+        datas = request.data.copy()  # request.data → request.data.copy() 변경
         # request.data는 Django의 QueryDict 객체로서 변경이 불가능하여 복사하여 수정한 후 전달하는 방법을 이용!
         datas["is_active"] = False
         serializer = UserDelSerializer(user, data=datas)
         if user.check_password(request.data.get("password")):
             if serializer.is_valid():
                 serializer.save()
-                return Response({"message": "계정 비활성화 완료"}, status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    {"message": "계정 비활성화 완료"}, status=status.HTTP_204_NO_CONTENT
+                )
         else:
             return Response(
                 {"message": f"패스워드가 다릅니다"}, status=status.HTTP_400_BAD_REQUEST
@@ -234,9 +234,16 @@ class FollowView(APIView):
 
     # 팔로우/팔로워 리스트
     def get(self, request, user_id):
-        followings = User.objects.filter(id=user_id)
-        serializer = FollowSerializer(followings, many=True)
-        return Response(serializer.data)
+        follow = User.objects.filter(id=user_id)
+        follow_serializer = FollowSerializer(follow, many=True)
+        request_follow = User.objects.filter(id=request.user.id)
+        request_follow_serializer = FollowSerializer(request_follow, many=True)
+        return Response(
+            {
+                "follow": follow_serializer.data,
+                "request_follow": request_follow_serializer.data,
+            }
+        )
 
 
 # ================================= 팔로우 끝 =================================

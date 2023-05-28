@@ -277,6 +277,17 @@ class SetNewPasswordSerializer(serializers.Serializer):
                 raise serializers.ValidationError(
                     detail={"repassword": "비밀번호가 일치하지 않습니다."}
                 )
+            # 비밀번호 유효성 검사
+            if password_validator(password):
+                raise serializers.ValidationError(
+                    detail={"password": "비밀번호는 8자 이상의 영문 대/소문자와 숫자, 특수문자를 포함하여야 합니다."}
+                )
+
+            # 비밀번호 유효성 검사
+            if password_pattern(password):
+                raise serializers.ValidationError(
+                    detail={"password": "비밀번호는 연속해서 3자리 이상 동일한 영문,숫자,특수문자 사용이 불가합니다."}
+                )
 
             user.set_password(password)
             user.save()
@@ -285,27 +296,6 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
         except User.DoesNotExist:
             raise serializers.ValidationError(detail={"user": "존재하지 않는 회원입니다."})
-
-
-# 비밀번호 재설정 serializer
-# class UserUpdatePasswordSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ("nickname","password","profile_img",)
-
-#     def create(self, validated_data):
-#         user = super().create(validated_data)
-#         password = user.password
-#         user.set_password(password)
-#         user.save()
-#         return user
-
-#     def update(self,instance, validated_data):
-#         user = super().update(instance,validated_data)
-#         password = user.password
-#         user.set_password(password)
-#         user.save()
-#         return user
 
 
 # User Token 획득

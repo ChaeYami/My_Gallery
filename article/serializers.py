@@ -2,27 +2,6 @@ from rest_framework import serializers
 from .models import Article, Comment
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-    comment_created_at = serializers.DateTimeField(
-        format="%y-%m-%d %H:%M", read_only=True
-    )
-
-    def get_user(self, obj):
-        return {"nickname": obj.user.nickname, "pk": obj.user.pk,"profile_img": str(obj.user.profile_img)}
-
-    class Meta:
-        model = Comment
-        exclude = ("article",)  # 게시글 필드 빼고 보여주기
-
-
-# comments작성
-class CommentCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = ("comment",)
-
-
 class ArticleSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     uploaded_image = serializers.ImageField()
@@ -60,3 +39,25 @@ class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ["id", "title", "user", "changed_image", "hearts"]
+        
+        
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    comment_created_at = serializers.DateTimeField(
+        format="%y-%m-%d %H:%M", read_only=True
+    )
+
+    def get_user(self, obj):
+        return {"nickname": obj.user.nickname, "pk": obj.user.pk,"profile_img": str(obj.user.profile_img)}
+
+    class Meta:
+        model = Comment
+        exclude = ("article",)  # 게시글 필드 빼고 보여주기
+
+
+# comments작성
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("comment",)

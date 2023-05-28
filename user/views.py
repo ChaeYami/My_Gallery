@@ -94,9 +94,8 @@ class VerifyEmailView(APIView):
             # return Response({"message": "이메일 인증이 완료되었습니다."}, status=status.HTTP_200_OK)
             return redirect("http://127.0.0.1:5500/user/login.html?alert=1")
         else:
-            return Response(
-                {"message": "잘못된 링크입니다."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return redirect("http://127.0.0.1:5500/user/login.html?alert=2")
+
 
 
 # ================================ 회원가입 끝 ================================

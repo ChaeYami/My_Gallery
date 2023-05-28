@@ -17,7 +17,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = "__all__"
 
-
 # 테스트 코드 에러 주석 처리
 class ArticleCreateSerializer(serializers.ModelSerializer):
     uploaded_image = serializers.ImageField()
@@ -26,6 +25,23 @@ class ArticleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ["title", "content", "uploaded_image", "changed_image", "change_id"]
+        extra_kwargs={
+            "title": {
+                "error_messages": {
+                    "blank": "제목을 입력해주세요",
+                }
+            },
+            "content": {
+                "error_messages": {
+                    "blank": "내용을 입력해주세요",
+                },
+            },
+            "uploaded_image": {
+                "error_messages": {
+                    "blank": "사진 있어야 됨",
+                },
+            },
+        }
         
 
 

@@ -82,18 +82,18 @@
     - 로그인한 사용자만 가능 (access token)
 
 ***
-ERD
+💜 ERD
 ------
 ![image](https://github.com/ChaeYami/MyGallery/assets/120750451/51b45c4d-4503-4f00-a407-a1bb394f799d)
 
-API 명세
+💚 API 명세
 ------
 [API 명세](https://www.notion.so/S-A-dd7cf4020b524e6f878f25b994c9de2a?pvs=4#98e29231ef8a463aa4a489e504fc2687)
 
-역할분담
+🧡 역할분담
 ------
 [역할분담](https://www.notion.so/1f3d9558f6214ac39cc43cad4064763b?v=cf34176ae70c43318fb22f9d572da1c9&pvs=4)
 
-회의록
+💛 회의록
 ------
 [회의록](https://www.notion.so/b0a1e10efe444ceba18f2a632b4ac328?pvs=4)

@@ -114,13 +114,6 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-    # def update(self, instance, validated_data):
-    #     user = super().update(instance, validated_data)
-    #     password = user.password
-    #     user.set_password(password)
-    #     user.save()
-    #     return user
-
 
 # 회원정보 수정 serializer
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -146,13 +139,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             )
 
         return data
-
-    # def create(self, validated_data):
-    #     user = super().create(validated_data)
-    #     password = user.password
-    #     user.set_password(password)
-    #     user.save()
-    #     return user
 
     def update(self, instance, validated_data):
         user = super().update(instance, validated_data)

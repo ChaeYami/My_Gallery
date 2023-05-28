@@ -205,7 +205,7 @@ class ArticleDetailViewTest(APITestCase):
         self.article_data["uploaded_image"] = uploaded_image
         self.article_data["changed_image"] = changed_image
        
-        response = self.client.put(
+        response = self.client.patch(
             path=reverse("articles:article_detail_view", kwargs={"article_id": 5}),
             data=self.article_data,
             # HTTP_AUTHORIZATION=f"Bearer {self.access_token}",

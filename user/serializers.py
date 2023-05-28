@@ -79,6 +79,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         account = data.get("account")
         password = data.get("password")
+        nickname = data.get("nickname")
 
         # 아이디 유효성 검사
         if account_validator(account):
@@ -98,9 +99,9 @@ class UserSerializer(serializers.ModelSerializer):
                 detail={"password": "비밀번호는 연속해서 3자리 이상 동일한 영문,숫자,특수문자 사용이 불가합니다."}
             )
             
-        if nickname_validator(password):
+        if nickname_validator(nickname):
             raise serializers.ValidationError(
-                detail={"password": "닉네임은 공백 없이 2자이상 8자 이하의 영문, 한글,'-' 또는'_'만 사용 가능합니다."}
+                detail={"nickname": "닉네임은 공백 없이 2자이상 8자 이하의 영문, 한글,'-' 또는'_'만 사용 가능합니다."}
             )
 
         return data

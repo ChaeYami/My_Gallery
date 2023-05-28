@@ -61,6 +61,13 @@ class UserSerializer(serializers.ModelSerializer):
                     "blank": "email은 필수 입력 사항입니다.",
                 }
             },
+            "nickname": {
+                "error_messages": {
+                    "required": "nickname은 필수 입력 사항입니다.",
+                    "invalid": "nickname 형식이 맞지 않습니다. 알맞은 형식의 nickname을 입력해주세요.",
+                    "blank": "nickname은 필수 입력 사항입니다.",
+                }
+            },
             "is_admin": {
                 "write_only": True,
             },
@@ -82,13 +89,18 @@ class UserSerializer(serializers.ModelSerializer):
         # 비밀번호 유효성 검사
         if password_validator(password):
             raise serializers.ValidationError(
-                detail={"password": "비밀번호는 8자 이상의 영문 대소문자와 숫자, 특수문자를 포함하여야 합니다."}
+                detail={"password": "비밀번호는 8자 이상의 영문 대/소문자와 숫자, 특수문자를 포함하여야 합니다."}
             )
 
         # 비밀번호 유효성 검사
         if password_pattern(password):
             raise serializers.ValidationError(
                 detail={"password": "비밀번호는 연속해서 3자리 이상 동일한 영문,숫자,특수문자 사용이 불가합니다."}
+            )
+            
+        if nickname_validator(password):
+            raise serializers.ValidationError(
+                detail={"password": "닉네임은 공백 없이 2자이상 8자 이하의 영문, 한글,'-' 또는'_'만 사용 가능합니다."}
             )
 
         return data
@@ -129,7 +141,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         # 닉네임 유효성 검사
         if nickname_validator(nickname):
             raise serializers.ValidationError(
-                detail={"nickname": "닉네임은 2자이상 8자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."}
+                detail={"닉네임은 공백 없이 2자이상 8자 이하의 영문, 한글,'-' 또는'_'만 사용 가능합니다."}
             )
 
         return data

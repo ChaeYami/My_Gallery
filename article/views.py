@@ -47,7 +47,9 @@ class ArticleDetailView(APIView):
     def patch(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
         if request.user == article.user:
-            serializer = ArticleCreateSerializer(article, data=request.data, partial=True)
+            serializer = ArticleCreateSerializer(
+                article, data=request.data, partial=True
+            )
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)

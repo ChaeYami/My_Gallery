@@ -13,6 +13,8 @@ from article.serializers import (
 )
 from user.models import User
 
+from django.db.models import Count
+
 
 class ArticleView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -123,10 +125,9 @@ class ArticleHeartsView(APIView):
         return Response({"hearts": heart_count})
 
 
-# --------------------- 게시글 좋아요 보기 ----------------------
 class HeartsListView(APIView):
+    # --------------------- 게시글 좋아요/취소 ----------------------
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
     def post(self, request, article_id):
         article = get_object_or_404(Article, id=article_id)
 
@@ -137,8 +138,28 @@ class HeartsListView(APIView):
             article.hearts.add(request.user)
             return Response("좋아요", status=status.HTTP_200_OK)
 
-    def get(self, request, user_id):
-        user = User.objects.get(id=user_id)
-        article = user.hearts.all()
-        serializer = ArticleSerializer(article, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request, user_id=None):
+        if user_id is None:
+            #----------------- 좋아요 순위 ----------------- 
+            # 게시글을 좋아요 수를 기준으로 정렬
+            article = Article.objects.annotate(hearts_count=Count('hearts')).order_by('-hearts_count')
+            # 필요한 정보를 추출하여 리스트에 저장
+            rank_list = []
+            for index, article in enumerate(article[:5]):  # 상위 5개 게시글만 
+                rank_item = {
+                    'rank': index + 1,
+                    'author': article.user.nickname,
+                    'title': article.title,
+                    'hearts': article.hearts_count, # 좋아요 수
+                    'article_id': article.id,
+                }
+                rank_list.append(rank_item)
+            return Response(rank_list, status=status.HTTP_200_OK)
+        else:
+            #----------------- 좋아요 게시글 보기 ----------------- 
+            user = User.objects.get(id=user_id)
+            article = user.hearts.all()
+            serializer = ArticleSerializer(article, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+

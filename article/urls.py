@@ -29,4 +29,5 @@ urlpatterns = [
     path(
         "list/<int:user_id>/", views.ArticleListView.as_view(), name="article_list"
     ),  # /article/<int:article_id>/list
+     path('hearts_rank/', views.HeartsListView.as_view(), name='hearts_rank'),
 ]

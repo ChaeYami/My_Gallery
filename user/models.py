@@ -74,8 +74,3 @@ class User(AbstractBaseUser):
         return self.is_admin
 
 
-# class CheckEmail(models.Model):
-#     email = models.EmailField("이메일", max_length=255, unique=True,)
-#     random_num=models.IntegerField()
-#     try_num = models.IntegerField(default=0)
-#     created_at = models.DateTimeField(auto_now_add=True)

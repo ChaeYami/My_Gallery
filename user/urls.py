@@ -22,6 +22,7 @@ urlpatterns = [
         "login/", views.CustomTokenObtainPairView.as_view(), name="login_view"
     ),  # /user/login/
     # path("refresh/", TokenRefreshView.as_view(), name="token_refresh"), # /user/refresh/
+
     path(
         "<int:user_id>/", views.ProfileView.as_view(), name="profile_view"
     ),  # /user/<int:user_id>/

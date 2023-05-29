@@ -30,7 +30,7 @@ class CustomTokenObtainPairViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.client = APIClient()
-        cls.email = 'ark375@naver.com'
+        cls.email = 'dsadasd123@naver.com'
         cls.account = 'admin'
         cls.nickname = 'admin'
         cls.password = 'G1843514dadg23!4'
@@ -145,7 +145,7 @@ class CustomTokenObtainPairViewTest(APITestCase):
 class ArticleDetailViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user_data = {'account':'admin','email':'ark375@naver.com','password':'G1843514dadg23!4'}
+        cls.user_data = {'account':'admin','email':'dsadasd123@naver.com','password':'G1843514dadg23!4'}
         cls.article_data = [
             {"title": "test Title1", "content": "test content1"},
             {"title": "test Title2", "content": "test content2"},
@@ -154,8 +154,8 @@ class ArticleDetailViewTest(APITestCase):
             {"title": "test Title5", "content": "test content5"},
         ]
         cls.user = User.objects.create_user(
-            'admin','ark375@naver.com','G1843514dadg23!4')
-        cls.user_data = {'account':'admin','email':'ark375@naver.com','password':'G1843514dadg23!4'}
+            'admin','dsadasd123@naver.com','G1843514dadg23!4')
+        cls.user_data = {'account':'admin','email':'dsadasd123@naver.com','password':'G1843514dadg23!4'}
         cls.article = []
         for i in range(5):
             cls.article.append(
@@ -237,11 +237,11 @@ class ArticleDetailViewTest(APITestCase):
 class CommentViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.email = 'ark375@naver.com'
+        cls.email = 'dsadasd123@naver.com'
         cls.nickname = 'admin'
         cls.account = 'admin'
         cls.password = 'G1843514dadg23!4'
-        cls.user_data = {'account':'admin','email':'ark375@naver.com','password':'G1843514dadg23!4'}
+        cls.user_data = {'account':'admin','email':'dsadasd123@naver.com','password':'G1843514dadg23!4'}
         cls.article_data = {"title": "test Title", "content": "test content"}
         cls.comment_data = {"comment": "test comment"}
         cls.user = User.objects.create_user(account=cls.account, email=cls.email, nickname=cls.nickname, password=cls.password)
@@ -298,11 +298,11 @@ class CommentViewTest(APITestCase):
 class CommentDetailViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.email = 'ark375@naver.com'
+        cls.email = 'dsadasd123@naver.com'
         cls.nickname = 'admin'
         cls.account = 'admin'
         cls.password = 'G1843514dadg23!4'
-        cls.user_data = {'account':'admin','email':'ark375@naver.com','password':'G1843514dadg23!4'}
+        cls.user_data = {'account':'admin','email':'dsadasd123@naver.com','password':'G1843514dadg23!4'}
         cls.article_data = {"title": "test Title", "content": "test content"}
         cls.comment_data = {"comment": "test comment"}
         cls.user = User.objects.create_user(account=cls.account, email=cls.email, nickname=cls.nickname, password=cls.password)
@@ -350,11 +350,11 @@ class CommentDetailViewTest(APITestCase):
 class HerartViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.email = 'ark375@naver.com'
+        cls.email = 'dsadasd123@naver.com'
         cls.nickname = 'admin'
         cls.account = 'admin'
         cls.password = 'G1843514dadg23!4'
-        cls.user_data = {'account':'admin','email':'ark375@naver.com','password':'G1843514dadg23!4'}
+        cls.user_data = {'account':'admin','email':'dsadasd123@naver.com','password':'G1843514dadg23!4'}
         cls.article_data = {"title": "test Title", "content": "test content"}
         cls.user = User.objects.create_user(account=cls.account, email=cls.email, nickname=cls.nickname, password=cls.password)
         cls.article = Article.objects.create(**cls.article_data, user=cls.user)

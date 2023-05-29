@@ -28,10 +28,12 @@ class ArticleView(APIView):
         serializer = ArticleCreateSerializer(data=request.data)
         if serializer.is_valid():
             if request.user.point >= 100:
-                request.user.point-= 100
+                request.user.point -= 100
                 request.user.save()
             else:
-                return Response({"message":"포인트가 부족합니다."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": "포인트가 부족합니다."}, status=status.HTTP_400_BAD_REQUEST
+                )
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -94,7 +96,7 @@ class CommentView(APIView):
     def post(self, request, article_id):
         serializer = CommentCreateSerializer(data=request.data)
         if serializer.is_valid():
-            request.user.point+= 50
+            request.user.point += 50
             request.user.save()
             serializer.save(user=request.user, article_id=article_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

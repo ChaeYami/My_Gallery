@@ -97,7 +97,6 @@ class VerifyEmailView(APIView):
             return redirect("http://127.0.0.1:5500/user/login.html?alert=2")
 
 
-
 # ================================ 회원가입 끝 ================================
 
 
@@ -272,5 +271,26 @@ class ActivateAccountView(APIView):
         except User.DoesNotExist:
             return Response(
                 {"message": "비활성화된 상태가 아닌 계정입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+# 출석체크
+class DailyCheckView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        me = request.user
+        if me.daily_check:
+            me.point += 50
+            me.daily_check = False
+            me.save()
+            return Response(
+                {"message": "로그인 성공! 출석 보상으로 50 point가 지급되었습니다."},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"message": "로그인 성공! 다음 출석 보상은 밤 12시 이후에 지급됩니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )

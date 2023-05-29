@@ -38,6 +38,7 @@ class User(AbstractBaseUser):
     introduce = models.TextField("소개", default=None, blank=True, null=True)
     joined_at = models.DateTimeField(auto_now_add=True)
     point = models.IntegerField("포인트", default=500)
+    daily_check = models.BooleanField("출석체크", default=True)
 
     followings = models.ManyToManyField(
         "self", symmetrical=False, related_name="followers", blank=True

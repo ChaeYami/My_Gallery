@@ -110,4 +110,4 @@
 
 💛 회의록
 ------
-[회의록](https://www.notion.so/b0a1e10efe444ceba18f2a632b4ac328?pvs=4)
+[회의록]([https://www.notion.so/b0a1e10efe444ceba18f2a632b4ac328?pvs=4](https://secretive-enthusiasm-4ee.notion.site/b0a1e10efe444ceba18f2a632b4ac328))

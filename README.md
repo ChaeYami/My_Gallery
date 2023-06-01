@@ -3,7 +3,7 @@
 
 🤗 배포
 ------
-> 배포가 완료되면 url을 추가할 예정입니다.
+> [My Little Gallery](https://mylittlegallery.netlify.app/)
 
 📚 stacks 
 ------

@@ -115,6 +115,6 @@
 ------
 [역할분담](https://www.notion.so/1f3d9558f6214ac39cc43cad4064763b?v=cf34176ae70c43318fb22f9d572da1c9&pvs=4)
 
-💛 회의록
+💛 전체 S.A.
 ------
-[회의록]([https://www.notion.so/b0a1e10efe444ceba18f2a632b4ac328?pvs=4](https://secretive-enthusiasm-4ee.notion.site/b0a1e10efe444ceba18f2a632b4ac328))
+[SA](https://secretive-enthusiasm-4ee.notion.site/S-A-dd7cf4020b524e6f878f25b994c9de2a?pvs=4)
